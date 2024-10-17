@@ -63,16 +63,24 @@ $jumlah_barang = mysqli_num_rows($result_barang);
                     <!-- Page Heading -->
                     <div class="d-sm-flex align-items-center justify-content-between mb-4">
                         <h1 class="h3 mb-0 text-gray-800">Dashboard Barang Masuk</h1>
-                        <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i
-                                class="fas fa-download fa-sm text-white-50"></i> Generate Report</a>
+
                     </div>
 
                     <!-- DataTales -->
                     <div class="card shadow mb-4">
                         <div class="card-header py-3">
-                            <h6 class="m-0 font-weight-bold text-primary">Stok Barang</h6>
-                            <!-- tombol tambah barang -->
-                            <button class="btn btn-primary mt-3">Tambah Barang</button>
+                            <h6 class="m-0 font-weight-bold text-primary mb-3">Barang Masuk</h6>
+                            <hr>
+                            <div class="d-flex flex-wrap justify-content-between">
+                                <!-- btn trigger modal tambah barang masuk -->
+                                <button type="button" class="btn btn-primary my-2" data-toggle="modal"
+                                    data-target="#modalTambahBarang">
+                                    Tambah Barang
+                                </button>
+                                <a href="#0" class="btn btn-sm my-2 py-2 btn-info">
+                                    <i class="fas fa-download fa-sm text-white-50"></i> Unduh Excel
+                                </a>
+                            </div>
                         </div>
 
 
@@ -96,6 +104,71 @@ $jumlah_barang = mysqli_num_rows($result_barang);
                                 </table>
                             </div>
                         </div>
+
+                        <!-- Modal tambah barang -->
+                        <div class="modal fade" id="modalTambahBarang">
+                            <div class="modal-dialog">
+                                <div class="modal-content text-dark">
+                                    <div class="modal-header">
+                                        <h4 class="modal-title">Tambah Barang</h4>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <form id="formTambahBarang">
+                                        <div class="modal-body">
+
+
+                                            <div class="form-group">
+                                                <label for="pilih_barang">Pilih Barang :</label>
+                                                <select class="form-control select2" name="pilih_barang"
+                                                    id="pilih_barang" style="width: 100%;">
+                                                    <?php
+                                                    $results_all_barang = $connected->query("SELECT * FROM barang");
+                                                    if ($results_all_barang->num_rows > 0) {
+                                                        while ($data_semua_barang = $results_all_barang->fetch_assoc()) {
+                                                            ?>
+                                                            <option value="<?= $data_semua_barang['barang_id'] ?>">
+                                                                <?= $data_semua_barang['nama'] . " - " . $data_semua_barang['nomor_bacth'] ?>
+                                                            </option>
+                                                        <?php }
+                                                    } ?>
+                                                </select>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="tanggal_masuk">Tanggal Masuk :</label>
+                                                <input type="date" class="form-control" id="tanggal_masuk"
+                                                    name="tanggal_masuk">
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="jumlah_masuk">Jumlah Masuk:</label>
+                                                <input type="number" class="form-control" id="jumlah_masuk"
+                                                    name="jumlah_masuk">
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="supplier">Supplier :</label>
+                                                <input type="text" class="form-control" id="supplier" name="supplier">
+                                            </div>
+                                            <div class="form-floating">
+                                                <label for="keterangan">
+                                                    Keterangan :
+                                                </label>
+                                                <textarea class="form-control" id="keterangan" name="keterangan"
+                                                    style="height: 85px; resize: none;"></textarea>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer justify-content-between">
+                                            <button type="button" class="btn btn-primary" name="tambahkanBarang"
+                                                id="tambahkanBarang">Tambahkan</button>
+                                        </div>
+                                    </form>
+                                </div>
+                                <!-- /.modal-content -->
+                            </div>
+                            <!-- /.modal-dialog -->
+                        </div>
+                        <!-- Modal tambah barang baru End -->
+
                     </div>
 
                 </div>
@@ -199,6 +272,23 @@ $jumlah_barang = mysqli_num_rows($result_barang);
                 ],
                 "responsive": true
             });
+
+            // Tambah Barang
+            $('#tambahBarang').click(function () {
+                var data = $('#formTambahBarang').serialize();
+                $.ajax({
+                    url: '../service/ajax/ajax-barang-masuk.php',
+                    type: 'POST',
+                    data: data,
+                    success: function (response) {
+                        $('#modalTambahBarang').modal('hide');
+                        tableListTemuan.ajax.reload();
+                        $('#formTambahBarang')[0].reset();
+                        alert(response);
+                    }
+                });
+            });
+
 
             // Menampilkan modal Update
             // $('#temuanTable').on('click', '.update', function () {

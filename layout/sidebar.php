@@ -24,7 +24,7 @@
     <li class="nav-item">
         <a class="nav-link" href="barang.php">
             <i class="fas fa-fw fa-box"></i>
-            <span>Stok Barang</span></a>
+            <span>Barang</span></a>
     </li>
 
     <!-- Nav Item -->
@@ -32,6 +32,20 @@
         <a class="nav-link" href="barang_masuk.php">
             <i class="fas fa-arrow-circle-down"></i>
             <span>Barang Masuk</span></a>
+    </li>
+
+    <!-- Nav Item -->
+    <li class="nav-item">
+        <a class="nav-link" href="barang_masuk.php">
+            <i class="fas fa-arrow-circle-up"></i>
+            <span>Barang Keluar</span></a>
+    </li>
+
+    <!-- Nav Item -->
+    <li class="nav-item">
+        <a class="nav-link" href="barang_masuk.php">
+            <i class="fas fa-arrow-circle-down"></i>
+            <span>History</span></a>
     </li>
 
     <!-- Divider -->
