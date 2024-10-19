@@ -289,14 +289,14 @@ $jumlah_barang = mysqli_num_rows($result_barang);
             });
 
             // Delete User
-            $('#tambahkanBarang').on('click', '.delete', function () {
-                var barang_id = $(this).data('barang_id');
+            $('#tableBarangMasuk').on('click', '.delete', function () {
+                var barang_masuk_id = $(this).data('barang_masuk_id');
                 if (confirm('Kamu yakin ingin menghapus data tambah barang ini?')) {
                     $.ajax({
                         url: '../service/ajax/ajax-barang-masuk.php',
                         type: 'DELETE',
                         data: {
-                            barang_id: barang_id
+                            barang_masuk_id: barang_masuk_id
                         },
                         success: function (response) {
                             table.ajax.reload();
