@@ -39,21 +39,35 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
 
 } else if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // tambah barang
-    $nomor_bacth = $_POST["nomor_bacth"];
-    $nama = $_POST["nama"];
-    $kategori = $_POST["kategori"];
-    $harga_satuan = $_POST["harga_satuan"];
-    $exp = $_POST["exp"];
-    $stok = $_POST["stok"];
-    $satuan = $_POST["satuan"];
+    $barang_id = $_POST["barang_id"]; // value id
+    $tanggal_masuk = $_POST["tanggal_masuk"];
+    $jumlah_masuk = $_POST["jumlah_masuk"];
+    $supplier = $_POST["supplier"];
+    $keterangan = $_POST["keterangan"];
 
-    $stmt = $connected->prepare($insert->selectTable($table_name = "barang_masuk", $condition = "(nomor_bacth, nama, kategori, harga_satuan, exp, stok, satuan) VALUES (?, ?, ?, ?, ?, ?, ?)"));
-    $stmt->bind_param("sssssss", $username, $hash_password, $nama_lengkap, $email, $tanggal_lahir, $jenis_kelamin, $role);
+    $stmt = $connected->prepare($insert->selectTable($table_name = "barang_masuk", $condition = "(barang_id, tanggal_masuk, jumlah_masuk, supplier, keterangan) VALUES (?, ?, ?, ?, ?)"));
+    $stmt->bind_param("isiss", $barang_id, $tanggal_masuk, $jumlah_masuk, $supplier, $keterangan);
 
     if ($stmt->execute()) {
-        echo "Berhasil menambahkan pengguna";
+        // Query untuk memperbarui stok di tabel barang
+        $update_stmt = $connected->prepare("UPDATE barang SET stok = stok + ? WHERE barang_id = ?");
+        $update_stmt->bind_param("ii", $jumlah_masuk, $barang_id);
+
+        // Eksekusi query update
+        if ($update_stmt->execute()) {
+            // Jika kedua query berhasil, commit transaksi
+            $connected->commit();
+            echo "Barang berhasil ditambahkan dan stok diperbarui.";
+        } else {
+            // Jika update stok gagal, rollback transaksi
+            $connected->rollback();
+            echo "Gagal memperbarui stok. Transaksi dibatalkan.";
+        }
+
+        echo "Barang berhasil ditambahkan dan stok diperbarui.";
     } else {
-        echo "Gagal menambahkan pengguna: " . $stmt->error;
+        echo "Gagal memperbarui stok. Transaksi dibatalkan." . $stmt->error;
+        // echo "Gagal menambahkan pengguna: " . $stmt->error;
     }
     $stmt->close();
 }

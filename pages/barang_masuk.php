@@ -117,8 +117,6 @@ $jumlah_barang = mysqli_num_rows($result_barang);
                                     </div>
                                     <form id="formTambahBarang">
                                         <div class="modal-body">
-
-
                                             <div class="form-group">
                                                 <label for="pilih_barang">Pilih Barang :</label>
                                                 <select class="form-control select2" name="pilih_barang"
@@ -128,6 +126,7 @@ $jumlah_barang = mysqli_num_rows($result_barang);
                                                     if ($results_all_barang->num_rows > 0) {
                                                         while ($data_semua_barang = $results_all_barang->fetch_assoc()) {
                                                             ?>
+                                                            <!-- <input type="hidden" value="<?= $data_semua_barang['barang_id'] ?>"> -->
                                                             <option value="<?= $data_semua_barang['barang_id'] ?>">
                                                                 <?= $data_semua_barang['nama'] . " - " . $data_semua_barang['nomor_bacth'] ?>
                                                             </option>
@@ -274,7 +273,7 @@ $jumlah_barang = mysqli_num_rows($result_barang);
             });
 
             // Tambah Barang
-            $('#tambahBarang').click(function () {
+            $('#tambahkanBarang').click(function () {
                 var data = $('#formTambahBarang').serialize();
                 $.ajax({
                     url: '../service/ajax/ajax-barang-masuk.php',
@@ -282,11 +281,29 @@ $jumlah_barang = mysqli_num_rows($result_barang);
                     data: data,
                     success: function (response) {
                         $('#modalTambahBarang').modal('hide');
-                        tableListTemuan.ajax.reload();
+                        table.ajax.reload();
                         $('#formTambahBarang')[0].reset();
                         alert(response);
                     }
                 });
+            });
+
+            // Delete User
+            $('#tambahkanBarang').on('click', '.delete', function () {
+                var barang_id = $(this).data('barang_id');
+                if (confirm('Kamu yakin ingin menghapus data tambah barang ini?')) {
+                    $.ajax({
+                        url: '../service/ajax/ajax-barang-masuk.php',
+                        type: 'DELETE',
+                        data: {
+                            barang_id: barang_id
+                        },
+                        success: function (response) {
+                            table.ajax.reload();
+                            alert(response);
+                        }
+                    });
+                }
             });
 
 
@@ -325,13 +342,13 @@ $jumlah_barang = mysqli_num_rows($result_barang);
 
             // Menampilkan modal Edit User
             // $('#pengguna_table').on('click', '.edit', function () {
-            //     let user_id = $(this).data('user_id');
+            //     let barang_id = $(this).data('barang_id');
             //     $.ajax({
-            //         url: '../service/ajax/ajax-pengguna.php?user_id=' + user_id,
+            //         url: '../service/ajax/ajax-pengguna.php?barang_id=' + barang_id,
             //         type: 'GET',
             //         dataType: 'json',
             //         success: function (data) {
-            //             $('#edit_user_id').val(data.user_id);
+            //             $('#edit_barang_id').val(data.barang_id);
             //             $('#edit_username').val(data.username);
             //             $('#edit_nama_lengkap').val(data.nama_lengkap);
             //             $('#edit_email').val(data.email);
@@ -358,23 +375,7 @@ $jumlah_barang = mysqli_num_rows($result_barang);
             //     });
             // });
 
-            // Delete User
-            // $('#pengguna_table').on('click', '.delete', function () {
-            //     var user_id = $(this).data('user_id');
-            //     if (confirm('Kamu yakin ingin menghapus pengguna ini?')) {
-            //         $.ajax({
-            //             url: '../service/ajax/ajax-pengguna.php',
-            //             type: 'DELETE',
-            //             data: {
-            //                 user_id: user_id
-            //             },
-            //             success: function (response) {
-            //                 table.ajax.reload();
-            //                 alert(response);
-            //             }
-            //         });
-            //     }
-            // });
+
 
         });
 
