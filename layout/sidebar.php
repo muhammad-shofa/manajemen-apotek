@@ -36,14 +36,14 @@
 
     <!-- Nav Item -->
     <li class="nav-item">
-        <a class="nav-link" href="barang_masuk.php">
+        <a class="nav-link" href="barang_keluar.php">
             <i class="fas fa-arrow-circle-up"></i>
             <span>Barang Keluar</span></a>
     </li>
 
     <!-- Nav Item -->
     <li class="nav-item">
-        <a class="nav-link" href="barang_masuk.php">
+        <a class="nav-link" href="history.php">
             <i class="fas fa-arrow-circle-down"></i>
             <span>History</span></a>
     </li>

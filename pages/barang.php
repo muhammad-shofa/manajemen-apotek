@@ -11,10 +11,6 @@ if ($_SESSION["is_login"] == false) {
     header("location: ../index.php");
 }
 
-// jumlah barang
-$result_barang = $connected->query($select->selectTable($table_name = "barang", $fields = "*"));
-$jumlah_barang = mysqli_num_rows($result_barang);
-
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -25,7 +21,7 @@ $jumlah_barang = mysqli_num_rows($result_barang);
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    <title>Apotek | Dashboard</title>
+    <title>Apotek | Stok Barang</title>
 
     <!-- Custom fonts for this template-->
     <link href="../vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
@@ -67,6 +63,11 @@ $jumlah_barang = mysqli_num_rows($result_barang);
                                 class="fas fa-download fa-sm text-white-50"></i> Generate Report</a>
                     </div>
 
+                    <!-- btn trigger modal tambah berita -->
+                    <button type="button" class="btn btn-primary my-2" data-toggle="modal" data-target="#modalTambah">
+                        Tambah Tipe Barang
+                    </button>
+
                     <!-- DataTales -->
                     <div class="card shadow mb-4">
                         <div class="card-header py-3">
@@ -79,11 +80,12 @@ $jumlah_barang = mysqli_num_rows($result_barang);
                                     <thead>
                                         <tr>
                                             <th>No</th>
-                                            <th>Nomor Bacth</th>
+                                            <!-- <th>Nomor Bacth</th> -->
                                             <th>Nama</th>
                                             <th>Kategori</th>
                                             <th>Harga Satuan</th>
-                                            <th>Exp</th>
+                                            <th>Harga Butir</th>
+                                            <!-- <th>Exp</th> -->
                                             <th>Stok</th>
                                             <th>Satuan</th>
                                             <th>Aksi</th>
@@ -98,6 +100,132 @@ $jumlah_barang = mysqli_num_rows($result_barang);
 
                 </div>
                 <!-- /.container-fluid -->
+
+                <!-- Modal tambah barang start -->
+                <div class="modal fade" id="modalTambah">
+                    <div class="modal-dialog">
+                        <div class="modal-content text-dark">
+                            <div class="modal-header">
+                                <h4 class="modal-title">Tambah Tipe Barang</h4>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <form id="formTambah" method="POST">
+                                <div class="modal-body">
+                                    <input type="hidden" class="form-control" id="tambah_barang_id" name="barang_id">
+                                    <div class="form-group">
+                                        <label for="tambah_nama">Nama :</label>
+                                        <input type="text" class="form-control" id="tambah_nama" name="nama">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="tambah_kategori">Kategori :</label>
+                                        <select class="form-control select2" name="kategori" id="tambah_kategori"
+                                            style="width: 100%;">
+                                            <option value="Obat">Obat</option>
+                                            <option value="Makanan">Makanan</option>
+                                            <option value="Minuman">Minuman</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="tambah_harga_satuan">Harga Satuan :</label>
+                                        <input type="number" class="form-control" id="tambah_harga_satuan"
+                                            name="harga_satuan">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="tambah_harga_butir">Harga Butir :</label>
+                                        <input type="number" class="form-control" id="tambah_harga_butir"
+                                            name="harga_butir">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="tambah_stok">Stok :</label>
+                                        <input type="number" class="form-control" id="tambah_stok" name="stok">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="tambah_satuan">Satuan :</label>
+                                        <select class="form-control select2" name="satuan" id="tambah_satuan"
+                                            style="width: 100%;">
+                                            <option value="Pcs">Pcs</option>
+                                            <option value="Butir">Butir</option>
+                                            <option value="Strip">Strip</option>
+                                            <option value="Botol">Botol</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="modal-footer justify-content-between">
+                                    <button type="button" class="btn btn-primary" name="simpanTambah"
+                                        id="simpanTambah">Tambahkan</button>
+                                </div>
+                            </form>
+                        </div>
+                        <!-- /.modal-content -->
+                    </div>
+                    <!-- /.modal-dialog -->
+                </div>
+                <!-- Modal tambah barang End -->
+
+                <!-- Modal edit barang start -->
+                <div class="modal fade" id="modalEdit">
+                    <div class="modal-dialog">
+                        <div class="modal-content text-dark">
+                            <div class="modal-header">
+                                <h4 class="modal-title">Edit Barang</h4>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <form id="formEdit" method="POST">
+                                <div class="modal-body">
+                                    <input type="hidden" class="form-control" id="edit_barang_id" name="barang_id">
+                                    <div class="form-group">
+                                        <label for="edit_nama">Nama :</label>
+                                        <input type="text" class="form-control" id="edit_nama" name="nama">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="edit_kategori">Kategori :</label>
+                                        <select class="form-control select2" name="kategori" id="edit_kategori"
+                                            style="width: 100%;">
+                                            <option value="Obat">Obat</option>
+                                            <option value="Makanan">Makanan</option>
+                                            <option value="Minuman">Minuman</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="edit_harga_satuan">Harga Satuan :</label>
+                                        <input type="number" class="form-control" id="edit_harga_satuan"
+                                            name="harga_satuan">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="edit_harga_butir">Harga Butir :</label>
+                                        <input type="number" class="form-control" id="edit_harga_butir"
+                                            name="harga_butir">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="edit_stok">Stok :</label>
+                                        <input type="number" class="form-control" id="edit_stok" name="stok">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="edit_satuan">Satuan :</label>
+                                        <select class="form-control select2" name="satuan" id="edit_satuan"
+                                            style="width: 100%;">
+                                            <option value="Pcs">Pcs</option>
+                                            <option value="Butir">Butir</option>
+                                            <option value="Strip">Strip</option>
+                                            <option value="Botol">Botol</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="modal-footer justify-content-between">
+                                    <button type="button" class="btn btn-success" name="simpanEdit"
+                                        id="simpanEdit">Simpan</button>
+                                </div>
+                            </form>
+                        </div>
+                        <!-- /.modal-content -->
+                    </div>
+                    <!-- /.modal-dialog -->
+                </div>
+                <!-- Modal edit barang End -->
 
                 <!-- Footer -->
                 <footer class="sticky-footer bg-white">
@@ -174,9 +302,9 @@ $jumlah_barang = mysqli_num_rows($result_barang);
                 "columns": [{
                     "data": "no"
                 },
-                {
-                    "data": "nomor_bacth"
-                },
+                // {
+                //     "data": "nomor_bacth"
+                // },
                 {
                     "data": "nama"
                 },
@@ -187,7 +315,7 @@ $jumlah_barang = mysqli_num_rows($result_barang);
                     "data": "harga_satuan"
                 },
                 {
-                    "data": "exp"
+                    "data": "harga_butir"
                 },
                 {
                     "data": "stok"
@@ -204,39 +332,75 @@ $jumlah_barang = mysqli_num_rows($result_barang);
                 "responsive": true
             });
 
-            // Menampilkan modal Update
-            // $('#temuanTable').on('click', '.update', function () {
-            //     let temuan_id = $(this).data('temuan_id');
-            //     $.ajax({
-            //         url: '../service/ajax/ajax-temuan.php?temuan_id=' + temuan_id,
-            //         type: 'GET',
-            //         dataType: 'json',
-            //         success: function (data) {
-            //             $('#temuan_id').val(data.temuan_id);
-            //             $('#rekomendasi_tindak_lanjut').val(data.rekomendasi_tindak_lanjut);
-            //             $('#status').val(data.status);
-            //             $('#dokumentasi_tl').val(data.dokumentasi_tl);
-            //             $('#modalUpdate').modal('show');
-            //         }
-            //     });
-            // });
+            // Tambah tipe barang
+            $('#simpanTambah').click(function () {
+                var data = $('#formTambah').serialize();
+                $.ajax({
+                    url: '../service/ajax/ajax-barang.php',
+                    type: 'POST',
+                    data: data,
+                    success: function (response) {
+                        $('#modalTambah').modal('hide');
+                        table.ajax.reload();
+                        $('#formTambah')[0].reset();
+                        alert(response);
+                    }
+                });
+            });
 
-            // Menyimpan update
-            // $('#simpanUpdate').click(function () {
-            //     var data = $('#formUpdate').serialize();
-            //     $.ajax({
-            //         url: '../service/ajax/ajax-temuan.php',
-            //         type: 'PUT',
-            //         data: data,
-            //         success: function (response) {
-            //             $('#modalUpdate').modal('hide');
-            //             table.ajax.reload();
-            //             $('#formUpdate')[0].reset();
-            //             alert(response);
-            //         }
-            //     });
-            // });
+            // Menampilkan modal edit
+            $('#tableBarang').on('click', '.edit', function () {
+                let barang_id = $(this).data('barang_id');
+                $.ajax({
+                    url: '../service/ajax/ajax-barang.php?barang_id=' + barang_id,
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function (data) {
+                        $('#edit_barang_id').val(data.barang_id);
+                        $('#edit_nama').val(data.nama);
+                        $('#edit_kategori').val(data.kategori);
+                        $('#edit_harga_satuan').val(data.harga_satuan);
+                        $('#edit_harga_butir').val(data.harga_butir);
+                        $('#edit_stok').val(data.stok);
+                        $('#edit_satuan').val(data.satuan);
+                        $('#modalEdit').modal('show');
+                    }
+                });
+            });
 
+            // Menyimpan edit
+            $('#simpanEdit').click(function () {
+                var data = $('#formEdit').serialize();
+                $.ajax({
+                    url: '../service/ajax/ajax-barang.php',
+                    type: 'PUT',
+                    data: data,
+                    success: function (response) {
+                        $('#modalEdit').modal('hide');
+                        table.ajax.reload();
+                        $('#formEdit')[0].reset();
+                        alert(response);
+                    }
+                });
+            });
+
+            // Delete barang
+            $('#tableBarang').on('click', '.delete', function () {
+                var barang_id = $(this).data('barang_id');
+                if (confirm('Kamu yakin ingin menghapus data barang ini?')) {
+                    $.ajax({
+                        url: '../service/ajax/ajax-barang.php',
+                        type: 'DELETE',
+                        data: {
+                            barang_id: barang_id
+                        },
+                        success: function (response) {
+                            table.ajax.reload();
+                            alert(response);
+                        }
+                    });
+                }
+            });
             // Menampilkan modal Edit User
             // $('#pengguna_table').on('click', '.edit', function () {
             //     let user_id = $(this).data('user_id');

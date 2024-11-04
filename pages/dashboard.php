@@ -14,14 +14,6 @@ if ($_SESSION["is_login"] == false) {
 // jumlah total_stok
 $results_total_stok = $connected->query("SELECT SUM(stok) AS total_stok FROM barang");
 $d_total_stok = mysqli_fetch_assoc($results_total_stok);
-// $result_total_stok = $connected->query($query_total_stok);
-
-
-
-// $result_total_stok = $connected->query($select->selectTable($table_name = "barang", $condition = ""));
-// $jumlah_barang = mysqli_num_rows($result_barang);
-
-
 
 ?>
 <!DOCTYPE html>

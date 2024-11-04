@@ -27,6 +27,9 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
             $row['no'] = $i;
             $row['harga_satuan'] = number_format($row['harga_satuan'], 0, ',', '.');
 
+            if (!empty($row['exp'])) {
+                $row['exp'] = date("d/m/Y", strtotime($row['exp']));
+            }
 
             $row['action'] = '<button type="button" class="edit btn btn-primary btn-sm" data-barang_id="' . $row['barang_id'] . '" data-toggle="modal"><i class="fas fa-pen"></i></button>
             <button type="button" class="delete btn btn-danger btn-sm" data-barang_id="' . $row['barang_id'] . '" data-toggle="modal"><i class="fas fa-trash"></i></button>';
@@ -37,24 +40,60 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
         echo json_encode(["data" => $data]);
     }
 
-} else if ($_SERVER["REQUEST_METHOD"] == "PUT") {
-    // Update 
-    parse_str(file_get_contents("php://input"), $data);
-    $temuan_id = $data["temuan_id"];
-    $rekomendasi_tindak_lanjut = $data["rekomendasi_tindak_lanjut"];
-    $status = $data["status"];
-    $dokumentasi_tl = $data["dokumentasi_tl"];
+} else if ($_SERVER['REQUEST_METHOD'] == "POST") {
+    // $nomor_bacth = htmlspecialchars($_POST["nomor_bacth"]);
+    $nama = htmlspecialchars($_POST["nama"]);
+    $kategori = htmlspecialchars($_POST["kategori"]);
+    $harga_satuan = htmlspecialchars($_POST["harga_satuan"]); // i
+    $harga_butir = htmlspecialchars($_POST["harga_butir"]); // i
+    // $exp = htmlspecialchars($_POST["exp"]);
+    // if (empty($exp)) {
+    //     $exp = NULL;
+    // }
+    $stok = htmlspecialchars($_POST["stok"]); // i
+    $satuan = htmlspecialchars($_POST["satuan"]);
 
-    $stmt = $connected->prepare($update->selectTable($table_name = "temuan", $condition = "rekomendasi_tindak_lanjut = ?, status = ?, dokumentasi_tl = ? WHERE temuan_id = ?"));
-    $stmt->bind_param("sssi", $rekomendasi_tindak_lanjut, $status, $dokumentasi_tl, $temuan_id);
+    $stmt = $connected->prepare($insert->selectTable($table_name = "barang", $condition = "(nama, kategori, harga_satuan, harga_butir, stok, satuan) VALUES (?, ?, ?, ?, ?, ?)"));
+    $stmt->bind_param("ssiiis", $nama, $kategori, $harga_satuan, $harga_butir, $stok, $satuan);
 
     if ($stmt->execute()) {
-        echo "Berhasil mengupdate";
+        echo "Berhasil menambah tipe barang baru";
     } else {
-        echo "Gagal mengupdate " . $stmt->error;
+        echo "Gagal menambah tipe barang baru " . $stmt->error;
+    }
+
+} else if ($_SERVER["REQUEST_METHOD"] == "PUT") {
+    parse_str(file_get_contents("php://input"), $data);
+    $barang_id = $data["barang_id"];
+    $nama = $data["nama"];
+    $kategori = $data["kategori"];
+    $harga_satuan = $data["harga_satuan"]; // i
+    $stok = $data["stok"]; // i
+    $satuan = $data["satuan"];
+
+    $stmt = $connected->prepare($update->selectTable($table_name = "barang", $condition = "nama = ?, kategori = ?, harga_satuan = ?, stok = ?, satuan = ? WHERE barang_id = ?"));
+    $stmt->bind_param("ssiisi", $nama, $kategori, $harga_satuan, $stok, $satuan, $barang_id);
+
+    if ($stmt->execute()) {
+        echo "Berhasil mengedit data barang";
+    } else {
+        echo "Gagal mengedit data barang " . $stmt->error;
     }
 
     $stmt->close();
+} else if ($_SERVER["REQUEST_METHOD"] == "DELETE") {
+    // Hapus barang 
+    parse_str(file_get_contents("php://input"), $data);
+    $barang_id = $data["barang_id"];
+
+    $stmt = $connected->prepare("DELETE FROM barang WHERE barang_id = ?");
+    $stmt->bind_param("i", $barang_id);
+
+    if ($stmt->execute()) {
+        echo "Berhasil menghapus tipe barang";
+    } else {
+        echo "Gagal menghapus tipe barang" . $stmt->error;
+    }
 }
 
 

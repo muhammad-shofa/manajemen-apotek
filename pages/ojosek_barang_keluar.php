@@ -11,7 +11,6 @@ if ($_SESSION["is_login"] == false) {
     header("location: ../index.php");
 }
 
-
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -22,7 +21,7 @@ if ($_SESSION["is_login"] == false) {
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    <title>Apotek | Barang Masuk</title>
+    <title>Apotek | Barang Keluar</title>
 
     <!-- Custom fonts for this template-->
     <link href="../vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
@@ -80,6 +79,7 @@ if ($_SESSION["is_login"] == false) {
                             </div>
                         </div>
 
+
                         <div class="card-body">
                             <div class="table-responsive">
                                 <table class="table table-bordered text-dark" id="tableBarangMasuk" width="100%"
@@ -88,10 +88,8 @@ if ($_SESSION["is_login"] == false) {
                                         <tr>
                                             <th>No</th>
                                             <th>Nama</th>
-                                            <th>Nomor Bacth</th>
                                             <th>Tanggal Masuk</th>
                                             <th>Jumlah Masuk</th>
-                                            <th>Exp</th>
                                             <th>Supplier</th>
                                             <th>Keterangan</th>
                                             <th>Aksi</th>
@@ -103,7 +101,7 @@ if ($_SESSION["is_login"] == false) {
                             </div>
                         </div>
 
-                        <!-- Modal tambah barang masuk start -->
+                        <!-- Modal tambah barang -->
                         <div class="modal fade" id="modalTambahBarang">
                             <div class="modal-dialog">
                                 <div class="modal-content text-dark">
@@ -124,18 +122,13 @@ if ($_SESSION["is_login"] == false) {
                                                     if ($results_all_barang->num_rows > 0) {
                                                         while ($data_semua_barang = $results_all_barang->fetch_assoc()) {
                                                             ?>
-                                                            <!-- <input type="hidden" value="<= $data_semua_barang['barang_id'] ?>"> -->
+                                                            <!-- <input type="hidden" value="<?= $data_semua_barang['barang_id'] ?>"> -->
                                                             <option value="<?= $data_semua_barang['barang_id'] ?>">
-                                                                <?= $data_semua_barang['nama'] ?>
+                                                                <?= $data_semua_barang['nama'] . " - " . $data_semua_barang['nomor_bacth'] ?>
                                                             </option>
                                                         <?php }
                                                     } ?>
                                                 </select>
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="nomor_bacth">Nomor Bacth :</label>
-                                                <input type="text" class="form-control" id="nomor_bacth"
-                                                    name="nomor_bacth">
                                             </div>
                                             <div class="form-group">
                                                 <label for="tanggal_masuk">Tanggal Masuk :</label>
@@ -143,13 +136,9 @@ if ($_SESSION["is_login"] == false) {
                                                     name="tanggal_masuk">
                                             </div>
                                             <div class="form-group">
-                                                <label for="jumlah_masuk">Jumlah Masuk :</label>
+                                                <label for="jumlah_masuk">Jumlah Masuk:</label>
                                                 <input type="number" class="form-control" id="jumlah_masuk"
                                                     name="jumlah_masuk">
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="exp">Exp :</label>
-                                                <input type="date" class="form-control" id="exp" name="exp">
                                             </div>
                                             <div class="form-group">
                                                 <label for="supplier">Supplier :</label>
@@ -173,97 +162,71 @@ if ($_SESSION["is_login"] == false) {
                             </div>
                             <!-- /.modal-dialog -->
                         </div>
-                        <!-- Modal tambah barang masuk End -->
+                        <!-- Modal tambah barang baru End -->
 
-                        <!-- Modal edit barang masuk start -->
-                        <div class="modal fade" id="modalEditBarangMasuk">
-                            <div class="modal-dialog">
-                                <div class="modal-content text-dark">
+                        <!-- Modal Edit Barang Masuk -->
+                        <div class="modal fade" id="modalEdit" tabindex="-1" role="dialog"
+                            aria-labelledby="modalEditLabel" aria-hidden="true">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content">
                                     <div class="modal-header">
-                                        <h4 class="modal-title">Edit Barang</h4>
+                                        <h5 class="modal-title" id="modalEditLabel">Edit Barang Masuk</h5>
                                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                             <span aria-hidden="true">&times;</span>
                                         </button>
                                     </div>
-                                    <form id="formEditBarangMasuk">
-                                        <div class="modal-body">
-                                            <!-- <div class="form-group">
-                                                <input type="text" name="barang_id" id="edit_barang_id"
-                                                    value="<= $barang_masuk_id ?>">
-                                                <label for="pilih_barang">Pilih Barang :</label>
-                                                <select class="form-control select2" name="pilih_barang"
-                                                    id="pilih_barang" style="width: 100%;">
-                                                    <php
+                                    <div class="modal-body">
+                                        <!-- Form untuk menampilkan data user pada modal -->
+                                        <form id="formEdit">
+                                            <input type="hidden" id="edit_barang_masuk_id" name="barang_masuk_id">
+                                            <div class="form-group">
+                                                <label for="edit_username">Username:</label>
+                                                <input type="text" class="form-control" id="edit_username"
+                                                    name="username">
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="edit_nama_lengkap">Nama Lengkap:</label>
+                                                <input type="text" class="form-control" id="edit_nama_lengkap"
+                                                    name="nama_lengkap">
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="edit_email">Email:</label>
+                                                <input type="email" class="form-control" id="edit_email" name="email">
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="edit_tanggal_lahir">Tanggal Lahir:</label>
+                                                <input type="text" class="form-control" id="edit_tanggal_lahir"
+                                                    name="tanggal_lahir">
+                                            </div>
 
-                                                    
-                                                    // Ambil barang_id dari tabel barang_masuk berdasarkan id yang sedang diedit
-                                                    $barang_masuk_id = 1; // Sesuaikan dengan id barang_masuk yang sedang diedit atau bisa dinamis
-                                                    $result_barang_masuk = $connected->query("SELECT barang_id FROM barang_masuk WHERE barang_masuk_id = $barang_masuk_id");
-                                                    $selected_barang_id = ($result_barang_masuk->num_rows > 0) ? $result_barang_masuk->fetch_assoc()['barang_id'] : null;
-
-
-                                                    $results_all_barang = $connected->query("SELECT * FROM barang");
-                                                    if ($results_all_barang->num_rows > 0) {
-                                                        while ($data_semua_barang = $results_all_barang->fetch_assoc()) {
-                                                            ?>
-                                                            <option value="<= $data_semua_barang['barang_id'] ?>">
-                                                                <= $data_semua_barang['nama'] ?>
-                                                            </option>
-                                                        <php }
-                                                    } ?>
+                                            <div class="form-group">
+                                                <label for="edit_jenis_kelamin">Jenis Kelamin:</label>
+                                                <select class="form-control select2" name="jenis_kelamin"
+                                                    id="edit_jenis_kelamin" style="width: 100%;">
+                                                    <option value="Laki-Laki">Laki-Laki</option>
+                                                    <option value="Perempuan">Perempuan</option>
                                                 </select>
-                                            </div> -->
+                                            </div>
 
-                                            <input type="text" name="barang_masuk_id" id="edit_barang_masuk_id">
                                             <div class="form-group">
-                                                <label for="edit_barang_id">Pilih Barang :</label>
-                                                <input type="text" class="form-control" id="edit_barang_id"
-                                                    name="barang_id">
-                                                <input type="text" class="form-control" id="edit_nama" name="nama">
+                                                <label for="edit_role">Role:</label>
+                                                <select class="form-control select2" name="role" id="edit_role"
+                                                    style="width: 100%;">
+                                                    <option value="Admin">Admin</option>
+                                                    <option value="Petugas">Petugas</option>
+                                                    <option value="User">User</option>
+                                                </select>
                                             </div>
-                                            <div class="form-group">
-                                                <label for="edit_nomor_bacth">Nomor Bacth :</label>
-                                                <input type="text" class="form-control" id="edit_nomor_bacth"
-                                                    name="nomor_bacth">
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="edit_tanggal_masuk">Tanggal Masuk :</label>
-                                                <input type="date" class="form-control" id="edit_tanggal_masuk"
-                                                    name="tanggal_masuk">
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="edit_jumlah_masuk">Jumlah Masuk :</label>
-                                                <input type="number" class="form-control" id="edit_jumlah_masuk"
-                                                    name="jumlah_masuk">
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="edit_exp">Exp :</label>
-                                                <input type="date" class="form-control" id="edit_exp" name="exp">
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="edit_supplier">Supplier :</label>
-                                                <input type="text" class="form-control" id="edit_supplier"
-                                                    name="supplier">
-                                            </div>
-                                            <div class="form-floating">
-                                                <label for="edit_keterangan">
-                                                    Keterangan :
-                                                </label>
-                                                <textarea class="form-control" id="edit_keterangan" name="keterangan"
-                                                    style="height: 85px; resize: none;"></textarea>
-                                            </div>
-                                        </div>
-                                        <div class="modal-footer justify-content-between">
-                                            <button type="button" class="btn btn-success" name="simpanEdit"
-                                                id="simpanEdit">Simpan</button>
-                                        </div>
-                                    </form>
+                                        </form>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-primary" id="simpanEdit">Simpan</button>
+                                    </div>
                                 </div>
-                                <!-- /.modal-content -->
                             </div>
-                            <!-- /.modal-dialog -->
                         </div>
-                        <!-- Modal edit barang masuk End -->
+                        <!-- Modal Edit Barang Masuk End -->
+
 
                     </div>
 
@@ -349,16 +312,10 @@ if ($_SESSION["is_login"] == false) {
                     "data": "nama"
                 },
                 {
-                    "data": "nomor_bacth"
-                },
-                {
                     "data": "tanggal_masuk"
                 },
                 {
                     "data": "jumlah_masuk"
-                },
-                {
-                    "data": "exp"
                 },
                 {
                     "data": "supplier"
@@ -394,43 +351,23 @@ if ($_SESSION["is_login"] == false) {
             // Menampilkan modal Edit barang masuk
             $('#tableBarangMasuk').on('click', '.edit', function () {
                 let barang_masuk_id = $(this).data('barang_masuk_id');
-                let barang_id = $(this).data('barang_id');
-                
                 $.ajax({
-                    url: '../service/ajax/ajax-barang-masuk.php?barang_masuk_id=' + barang_masuk_id + '&' + 'barang_id=' + barang_id,
-                    // url: '../service/ajax/ajax-barang-masuk.php?barang_masuk_id=' + barang_masuk_id,
+                    url: '../service/ajax/ajax-barang-masuk.php?barang_masuk_id=' + barang_masuk_id,
                     type: 'GET',
                     dataType: 'json',
                     success: function (data) {
                         $('#edit_barang_masuk_id').val(data.barang_masuk_id);
-                        $('#edit_barang_id').val(data.barang_id);
-                        $('#edit_nama').val(data.nama);
-                        $('#edit_nomor_bacth').val(data.nomor_bacth);
-                        $('#edit_tanggal_masuk').val(data.tanggal_masuk);
-                        $('#edit_jumlah_masuk').val(data.jumlah_masuk);
-                        $('#edit_exp').val(data.exp);
-                        $('#edit_supplier').val(data.supplier);
-                        $('#edit_keterangan').val(data.keterangan);
-                        $('#modalEditBarangMasuk').modal('show');
+                        $('#edit_username').val(data.username);
+                        $('#edit_nama_lengkap').val(data.nama_lengkap);
+                        $('#edit_email').val(data.email);
+                        $('#edit_tanggal_lahir').val(data.tanggal_lahir);
+                        $('#edit_jenis_kelamin').val(data.jenis_kelamin);
+                        $('#edit_role').val(data.role);
+                        $('#modalEdit').modal('show');
                     }
                 });
             });
 
-            // Menyimpan edit
-            $('#simpanEdit').click(function () {
-                var data = $('#formEditBarangMasuk').serialize();
-                $.ajax({
-                    url: '../service/ajax/ajax-barang-masuk.php',
-                    type: 'PUT',
-                    data: data,
-                    success: function (response) {
-                        $('#modalEdit').modal('hide');
-                        table.ajax.reload();
-                        $('#formEditBarangMasuk')[0].reset();
-                        alert(response);
-                    }
-                });
-            });
 
             // Delete barang masuk
             $('#tableBarangMasuk').on('click', '.delete', function () {
@@ -449,6 +386,60 @@ if ($_SESSION["is_login"] == false) {
                     });
                 }
             });
+
+
+            // Menampilkan modal Update
+            // $('#temuanTable').on('click', '.update', function () {
+            //     let temuan_id = $(this).data('temuan_id');
+            //     $.ajax({
+            //         url: '../service/ajax/ajax-temuan.php?temuan_id=' + temuan_id,
+            //         type: 'GET',
+            //         dataType: 'json',
+            //         success: function (data) {
+            //             $('#temuan_id').val(data.temuan_id);
+            //             $('#rekomendasi_tindak_lanjut').val(data.rekomendasi_tindak_lanjut);
+            //             $('#status').val(data.status);
+            //             $('#dokumentasi_tl').val(data.dokumentasi_tl);
+            //             $('#modalUpdate').modal('show');
+            //         }
+            //     });
+            // });
+
+            // Menyimpan update
+            // $('#simpanUpdate').click(function () {
+            //     var data = $('#formUpdate').serialize();
+            //     $.ajax({
+            //         url: '../service/ajax/ajax-temuan.php',
+            //         type: 'PUT',
+            //         data: data,
+            //         success: function (response) {
+            //             $('#modalUpdate').modal('hide');
+            //             table.ajax.reload();
+            //             $('#formUpdate')[0].reset();
+            //             alert(response);
+            //         }
+            //     });
+            // });
+
+
+
+            // Simpan edit user
+            // $('#simpanEdit').click(function () {
+            //     var data = $('#formEdit').serialize();
+            //     $.ajax({
+            //         url: '../service/ajax/ajax-pengguna.php',
+            //         type: 'PUT',
+            //         data: data,
+            //         success: function (response) {
+            //             $('#modalEdit').modal('hide');
+            //             table.ajax.reload();
+            //             alert(response);
+            //         }
+            //     });
+            // });
+
+
+
         });
 
     </script>

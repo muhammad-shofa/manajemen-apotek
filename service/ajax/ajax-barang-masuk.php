@@ -8,18 +8,46 @@ session_start();
 
 if ($_SERVER["REQUEST_METHOD"] == "GET") {
     // barang
+    // if (isset($_GET["barang_masuk_id"])) {
+    //     if (isset($_GET["barang_masuk_id"]) && isset($_GET['barang_id'])) {
+    //         $barang_id = $_GET['barang_id'];
+    //         $sql_nama_barang = $connected->query("SELECT nama FROM barang WHERE barang_id = $barang_id");
+    //         if ($sql_nama_barang->num_rows > 0) {
+    //             $data_nama = $sql_nama_barang->fetch_assoc();
+    //             echo json_encode($data_nama);
+    //         }
+    //     }
+    //     $barang_masuk_id = $_GET["barang_masuk_id"];
+    //     $stmt = $connected->prepare($select->selectTable($table_name = "barang_masuk", $fields = "*", $condition = "WHERE barang_masuk_id = ?"));
+    //     $stmt->bind_param("i", $barang_masuk_id);
+    //     $stmt->execute();
+    //     $result = $stmt->get_result();
+    //     $data = $result->fetch_assoc();
+    //     echo json_encode($data);
+    // }
     if (isset($_GET["barang_masuk_id"])) {
+        if (isset($_GET["barang_masuk_id"]) && isset($_GET['barang_id'])) {
+            $barang_id = $_GET['barang_id'];
+            $sql_nama_barang = $connected->query("SELECT nama FROM barang WHERE barang_id = $barang_id");
+            if ($sql_nama_barang->num_rows > 0) {
+                $data_nama = $sql_nama_barang->fetch_assoc();
+            }
+        }
         $barang_masuk_id = $_GET["barang_masuk_id"];
         $stmt = $connected->prepare($select->selectTable($table_name = "barang_masuk", $fields = "*", $condition = "WHERE barang_masuk_id = ?"));
         $stmt->bind_param("i", $barang_masuk_id);
         $stmt->execute();
         $result = $stmt->get_result();
         $data = $result->fetch_assoc();
+
+        // Gabungkan $data_nama dan $data menjadi satu variabel $data
+        if (isset($data_nama)) {
+            $data = array_merge($data, $data_nama);
+        }
+
         echo json_encode($data);
     } else {
         $result = $connected->query($select->selectTable($table_name = "barang_masuk", $fields = "bm.*, b.nama ", $condition = "bm JOIN barang b ON bm.barang_id = b.barang_id"));
-
-        // $result = $connected->query("SELECT bm.*, b.nama FROM barang_masuk bm JOIN barang b ON bm.barang_id = b.barang_id");
 
         $data = [];
 
@@ -28,7 +56,12 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
             $i++;
             $row['no'] = $i;
 
-            $row['action'] = '<button type="button" class="edit btn btn-primary btn-sm" data-barang_id="' . $row['barang_id'] . '" data-toggle="modal"><i class="fas fa-pen"></i></button>
+            $row['tanggal_masuk'] = date("d/m/Y", strtotime($row['tanggal_masuk']));
+            if (!empty($row['exp'])) {
+                $row['exp'] = date("d/m/Y", strtotime($row['exp']));
+            }
+
+            $row['action'] = '<button type="button" class="edit btn btn-primary btn-sm" data-barang_masuk_id="' . $row['barang_masuk_id'] . '" data-barang_id="' . $row['barang_id'] . '" data-toggle="modal"><i class="fas fa-pen"></i></button>
             <button type="button" class="delete btn btn-danger btn-sm" data-barang_masuk_id="' . $row['barang_masuk_id'] . '" data-toggle="modal"><i class="fas fa-trash"></i></button>';
 
             $data[] = $row;
@@ -39,14 +72,19 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
 
 } else if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // tambah barang
-    $barang_id = $_POST["pilih_barang"]; // value id
-    $tanggal_masuk = $_POST["tanggal_masuk"];
-    $jumlah_masuk = $_POST["jumlah_masuk"];
+    $barang_id = htmlspecialchars($_POST["pilih_barang"]); // value id
+    $nomor_bacth = htmlspecialchars($_POST["nomor_bacth"]);
+    $tanggal_masuk = htmlspecialchars($_POST["tanggal_masuk"]);
+    $jumlah_masuk = htmlspecialchars($_POST["jumlah_masuk"]);
+    $exp = htmlspecialchars($_POST["exp"]);
+    if (empty($exp)) {
+        $exp = NULL;
+    }
     $supplier = $_POST["supplier"];
     $keterangan = $_POST["keterangan"];
 
-    $stmt = $connected->prepare($insert->selectTable($table_name = "barang_masuk", $condition = "(barang_id, tanggal_masuk, jumlah_masuk, supplier, keterangan) VALUES (?, ?, ?, ?, ?)"));
-    $stmt->bind_param("isiss", $barang_id, $tanggal_masuk, $jumlah_masuk, $supplier, $keterangan);
+    $stmt = $connected->prepare($insert->selectTable($table_name = "barang_masuk", $condition = "(barang_id, nomor_bacth, tanggal_masuk, jumlah_masuk, exp, supplier, keterangan) VALUES (?, ?, ?, ?, ?, ?, ?)"));
+    $stmt->bind_param("ississs", $barang_id, $nomor_bacth, $tanggal_masuk, $jumlah_masuk, $exp, $supplier, $keterangan);
 
     if ($stmt->execute()) {
         // Query untuk memperbarui stok di tabel barang
@@ -63,11 +101,31 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
             $connected->rollback();
             echo "Gagal memperbarui stok. Transaksi dibatalkan.";
         }
-        echo "Barang berhasil ditambahkan dan stok diperbarui.";
+        // echo "Barang berhasil ditambahkan dan stok diperbarui.";
     } else {
         echo "Gagal memperbarui stok. Transaksi dibatalkan." . $stmt->error;
-        // echo "Gagal menambahkan pengguna: " . $stmt->error;
     }
+    $stmt->close();
+} else if ($_SERVER["REQUEST_METHOD"] == "PUT") {
+    parse_str(file_get_contents("php://input"), $data);
+    $barang_masuk_id = $data["barang_masuk_id"];
+    $nama = $data["nama"];
+    $nomor_bacth = $data["nomor_bacth"];
+    $tanggal_masuk = $data["tanggal_masuk"];
+    $jumlah_masuk = $data["jumlah_masuk"]; // i
+    $exp = $data["exp"];
+    $supplier = $data["supplier"];
+    $keterangan = $data["keterangan"];
+
+    $stmt = $connected->prepare($update->selectTable($table_name = "barang_masuk", $condition = "nama = ?, nomor_bacth = ?, tanggal_masuk = ?, jumlah_masuk = ?, exp = ?, supplier = ?, keterangan = ? WHERE barang_masuk_id = ?"));
+    $stmt->bind_param("sssisssi", $nama, $nomor_bacth, $tanggal_masuk, $jumlah_masuk, $exp, $supplier, $keterangan, $barang_masuk_id);
+
+    if ($stmt->execute()) {
+        echo "Berhasil mengedit data barang masuk";
+    } else {
+        echo "Gagal mengedit data barang masuk " . $stmt->error;
+    }
+
     $stmt->close();
 } else if ($_SERVER["REQUEST_METHOD"] == "DELETE") {
     // Hapus barang masuk

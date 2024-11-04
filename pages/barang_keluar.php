@@ -22,7 +22,7 @@ if ($_SESSION["is_login"] == false) {
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    <title>Apotek | Barang Masuk</title>
+    <title>Apotek | Barang Keluar</title>
 
     <!-- Custom fonts for this template-->
     <link href="../vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
@@ -59,21 +59,21 @@ if ($_SESSION["is_login"] == false) {
 
                     <!-- Page Heading -->
                     <div class="d-sm-flex align-items-center justify-content-between mb-4">
-                        <h1 class="h3 mb-0 text-gray-800">Dashboard Barang Masuk</h1>
+                        <h1 class="h3 mb-0 text-gray-800">Dashboard Barang Keluar</h1>
 
                     </div>
 
                     <!-- DataTales -->
                     <div class="card shadow mb-4">
                         <div class="card-header py-3">
-                            <h6 class="m-0 font-weight-bold text-primary mb-3">Barang Masuk</h6>
+                            <h6 class="m-0 font-weight-bold text-primary mb-3">Barang Keluar</h6>
                             <hr>
                             <div class="d-flex flex-wrap justify-content-between">
                                 <!-- btn trigger modal tambah barang masuk -->
-                                <button type="button" class="btn btn-primary my-2" data-toggle="modal"
+                                <!-- <button type="button" class="btn btn-primary my-2" data-toggle="modal"
                                     data-target="#modalTambahBarang">
-                                    Tambah Barang
-                                </button>
+                                    Tambah Barang Keluar
+                                </button> -->
                                 <a href="#0" class="btn btn-sm my-2 py-2 btn-info">
                                     <i class="fas fa-download fa-sm text-white-50"></i> Unduh Excel
                                 </a>
@@ -394,17 +394,15 @@ if ($_SESSION["is_login"] == false) {
             // Menampilkan modal Edit barang masuk
             $('#tableBarangMasuk').on('click', '.edit', function () {
                 let barang_masuk_id = $(this).data('barang_masuk_id');
-                let barang_id = $(this).data('barang_id');
-                
                 $.ajax({
-                    url: '../service/ajax/ajax-barang-masuk.php?barang_masuk_id=' + barang_masuk_id + '&' + 'barang_id=' + barang_id,
-                    // url: '../service/ajax/ajax-barang-masuk.php?barang_masuk_id=' + barang_masuk_id,
+                    url: '../service/ajax/ajax-barang-masuk.php?barang_masuk_id=' + barang_masuk_id + '&barang_id=' + barang_id,
                     type: 'GET',
                     dataType: 'json',
                     success: function (data) {
                         $('#edit_barang_masuk_id').val(data.barang_masuk_id);
                         $('#edit_barang_id').val(data.barang_id);
                         $('#edit_nama').val(data.nama);
+                        // $('#edit_nama').val(data.nama);
                         $('#edit_nomor_bacth').val(data.nomor_bacth);
                         $('#edit_tanggal_masuk').val(data.tanggal_masuk);
                         $('#edit_jumlah_masuk').val(data.jumlah_masuk);
