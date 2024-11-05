@@ -1,3 +1,17 @@
 #loginForm {
   max-width: 500px;
 }
+
+.pencarian {
+  width: 49%;
+  min-height: 220px;
+}
+
+.keranjang {
+  width: 49%;
+  min-height: 220px;
+}
+
+#resultContainer .card {
+  width: 45%;
+}

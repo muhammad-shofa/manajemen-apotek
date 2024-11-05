@@ -108,25 +108,42 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
     $stmt->close();
 } else if ($_SERVER["REQUEST_METHOD"] == "PUT") {
     parse_str(file_get_contents("php://input"), $data);
-    $barang_masuk_id = $data["barang_masuk_id"];
-    $nama = $data["nama"];
-    $nomor_bacth = $data["nomor_bacth"];
-    $tanggal_masuk = $data["tanggal_masuk"];
-    $jumlah_masuk = $data["jumlah_masuk"]; // i
-    $exp = $data["exp"];
-    $supplier = $data["supplier"];
-    $keterangan = $data["keterangan"];
+    $barang_masuk_id = htmlspecialchars($data["barang_masuk_id"]); // i
+    $barang_id = htmlspecialchars($data["barang_id"]); // i
+    $nomor_bacth = htmlspecialchars($data["nomor_bacth"]);
+    $tanggal_masuk = htmlspecialchars($data["tanggal_masuk"]);
+    $jumlah_masuk = htmlspecialchars($data["jumlah_masuk"]); // i 
+    $jumlah_masuk_old = htmlspecialchars($data["jumlah_masuk_old"]); // i untuk mengurangi stok pada tabel barang lalu ditambahkan dengan jumlah masuk yang baru
+    $exp = htmlspecialchars($data["exp"]);
+    if (empty($exp)) {
+        $exp = NULL;
+    }
+    $supplier = htmlspecialchars($data["supplier"]);
+    $keterangan = htmlspecialchars($data["keterangan"]);
 
-    $stmt = $connected->prepare($update->selectTable($table_name = "barang_masuk", $condition = "nama = ?, nomor_bacth = ?, tanggal_masuk = ?, jumlah_masuk = ?, exp = ?, supplier = ?, keterangan = ? WHERE barang_masuk_id = ?"));
-    $stmt->bind_param("sssisssi", $nama, $nomor_bacth, $tanggal_masuk, $jumlah_masuk, $exp, $supplier, $keterangan, $barang_masuk_id);
+    // update data pada tabel barang_masuk
+    $stmt_barang_masuk = $connected->prepare($update->selectTable($table_name = "barang_masuk", $condition = "nomor_bacth = ?, tanggal_masuk = ?, jumlah_masuk = ?, exp = ?, supplier = ?, keterangan = ? WHERE barang_masuk_id = ?"));
+    $stmt_barang_masuk->bind_param("ssisssi", $nomor_bacth, $tanggal_masuk, $jumlah_masuk, $exp, $supplier, $keterangan, $barang_masuk_id);
 
-    if ($stmt->execute()) {
+    // ambil stok pada barang masuk lalu kurangi dengan jumlah_masuk_old
+    $result_stok_barang = $connected->query("SELECT stok FROM barang WHERE barang_id = $barang_id");
+    $jumlah_stok_barang = $result_stok_barang->fetch_assoc()['stok'];
+
+    // kurangi stok barang saat ini dengan jumlah_masuk_old
+    $jumlah_real_stok_barang = (int) $jumlah_stok_barang - (int) $jumlah_masuk_old + (int) $jumlah_masuk;
+
+    // update jumlah_real_stok_barang ke tabel barang
+    $stmt_stok_barang = $connected->prepare($update->selectTable($table_name = "barang", $condition = "stok = ? WHERE barang_id = ?"));
+    $stmt_stok_barang->bind_param("ii", $jumlah_real_stok_barang, $barang_id);
+
+    if ($stmt_barang_masuk->execute() && $stmt_stok_barang->execute()) {
         echo "Berhasil mengedit data barang masuk";
     } else {
         echo "Gagal mengedit data barang masuk " . $stmt->error;
     }
 
-    $stmt->close();
+    $stmt_barang_masuk->close();
+    $stmt_stok_barang->close();
 } else if ($_SERVER["REQUEST_METHOD"] == "DELETE") {
     // Hapus barang masuk
     parse_str(file_get_contents("php://input"), $data);

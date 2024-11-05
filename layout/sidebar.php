@@ -7,11 +7,17 @@
             <i class="fas fa-laugh-wink"></i>
             <h6><b>Manajemen Apotek</b></h6>
         </div>
-        <!-- <div class="sidebar-brand-text mx-3">Seru</div> -->
     </a>
 
     <!-- Divider -->
     <hr class="sidebar-divider">
+
+    <!-- Nav Item -->
+    <li class="nav-item">
+        <a class="nav-link" href="kasir.php">
+            <i class="fas fa-fw fa-shopping-cart"></i>
+            <span>Kasir</span></a>
+    </li>
 
     <!-- Nav Item -->
     <li class="nav-item">

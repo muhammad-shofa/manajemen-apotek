@@ -115,6 +115,25 @@ if ($_SESSION["is_login"] == false) {
                                     </div>
                                     <form id="formTambahBarang">
                                         <div class="modal-body">
+                                            <!-- <div class="form-group">
+                                                <label for="pilih_barang">Pilih Barang :</label>
+                                                <input list="barang_list" class="form-control" id="pilih_barang"
+                                                    name="pilih_barang" placeholder="Cari barang...">
+                                                <datalist id="barang_list">
+                                                    <php
+                                                    $results_all_barang = $connected->query("SELECT * FROM barang");
+                                                    if ($results_all_barang->num_rows > 0) {
+                                                        while ($data_semua_barang = $results_all_barang->fetch_assoc()) {
+                                                            ?>
+                                                            <input type="text" value="<= $data_semua_barang['barang_id'] ?>">
+                                                            <option value="<= $data_semua_barang['nama'] ?><= $data_semua_barang['barang_id'] ?>">
+                                                                <= $data_semua_barang['nama'] ?>
+                                                            </option>
+                                                        <php }
+                                                    } ?>
+                                                </datalist>
+                                            </div> -->
+
                                             <div class="form-group">
                                                 <label for="pilih_barang">Pilih Barang :</label>
                                                 <select class="form-control select2" name="pilih_barang"
@@ -124,7 +143,6 @@ if ($_SESSION["is_login"] == false) {
                                                     if ($results_all_barang->num_rows > 0) {
                                                         while ($data_semua_barang = $results_all_barang->fetch_assoc()) {
                                                             ?>
-                                                            <!-- <input type="hidden" value="<= $data_semua_barang['barang_id'] ?>"> -->
                                                             <option value="<?= $data_semua_barang['barang_id'] ?>">
                                                                 <?= $data_semua_barang['nama'] ?>
                                                             </option>
@@ -235,6 +253,8 @@ if ($_SESSION["is_login"] == false) {
                                                 <label for="edit_jumlah_masuk">Jumlah Masuk :</label>
                                                 <input type="number" class="form-control" id="edit_jumlah_masuk"
                                                     name="jumlah_masuk">
+                                                <input type="hidden" class="form-control" id="edit_jumlah_masuk_old"
+                                                    name="jumlah_masuk_old">
                                             </div>
                                             <div class="form-group">
                                                 <label for="edit_exp">Exp :</label>
@@ -335,6 +355,10 @@ if ($_SESSION["is_login"] == false) {
     <script src="../vendor/datatables/jquery.dataTables.min.js"></script>
     <script src="../vendor/datatables/dataTables.bootstrap4.min.js"></script>
 
+    <!-- Include Select2 CSS and JS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+
     <!-- Page level custom scripts -->
     <!-- <script src="../js/demo/datatables-demo.js"></script> -->
 
@@ -395,10 +419,9 @@ if ($_SESSION["is_login"] == false) {
             $('#tableBarangMasuk').on('click', '.edit', function () {
                 let barang_masuk_id = $(this).data('barang_masuk_id');
                 let barang_id = $(this).data('barang_id');
-                
+
                 $.ajax({
                     url: '../service/ajax/ajax-barang-masuk.php?barang_masuk_id=' + barang_masuk_id + '&' + 'barang_id=' + barang_id,
-                    // url: '../service/ajax/ajax-barang-masuk.php?barang_masuk_id=' + barang_masuk_id,
                     type: 'GET',
                     dataType: 'json',
                     success: function (data) {
@@ -408,6 +431,7 @@ if ($_SESSION["is_login"] == false) {
                         $('#edit_nomor_bacth').val(data.nomor_bacth);
                         $('#edit_tanggal_masuk').val(data.tanggal_masuk);
                         $('#edit_jumlah_masuk').val(data.jumlah_masuk);
+                        $('#edit_jumlah_masuk_old').val(data.jumlah_masuk);
                         $('#edit_exp').val(data.exp);
                         $('#edit_supplier').val(data.supplier);
                         $('#edit_keterangan').val(data.keterangan);
@@ -424,7 +448,7 @@ if ($_SESSION["is_login"] == false) {
                     type: 'PUT',
                     data: data,
                     success: function (response) {
-                        $('#modalEdit').modal('hide');
+                        $('#modalEditBarangMasuk').modal('hide');
                         table.ajax.reload();
                         $('#formEditBarangMasuk')[0].reset();
                         alert(response);
