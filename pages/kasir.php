@@ -60,12 +60,12 @@ if ($_SESSION["is_login"] == false) {
 
                     <!-- Page Heading -->
                     <div class="d-sm-flex align-items-center justify-content-between mb-4">
-                        <h1 class="h3 mb-0 text-gray-800">Kasir</h1>
+                        <h1 class="h3 mb-0 text-gray-800">Kasir Apotek</h1>
                     </div>
 
                     <div class="d-flex flex-wrap justify-content-between">
                         <!-- daftar barang kasir start -->
-                        <div class="card pencarian shadow mb-4 p-3">
+                        <div class="card pencarian shadow mb-4 p-3 text-dark">
                             <input type="text" id="searchInput" class="form-control w-100" placeholder="Cari produk...">
                             <div id="resultContainer" class="d-flex flex-wrap mt-2 text-center">
                                 <?php
@@ -89,10 +89,18 @@ if ($_SESSION["is_login"] == false) {
                         <!-- daftar barang kasir end -->
 
                         <!-- keranjang start -->
-                        <div class="card keranjang shadow mb-4 p-3">
+                        <div class="card keranjang shadow mb-4 p-3 text-dark">
                             <h4>Keranjang</h4>
                             <div id="keranjangContainer" class="w-100 d-flex flex-column p-2">
                                 <!-- Produk akan ditambahkan di sini -->
+                            </div>
+                            <!-- Total Harga Semua Barang -->
+                            <div class="mt-3">
+                                <form method="POST" id="formKeranjang" onsubmit="return false;">
+                                    <h4>Total Harga: <span id="totalHargaSemuaBarang">Rp 0</span></h4>
+                                    <button type="button" class="btn btn-success" name="btnSelesai"
+                                        id="btnSelesai">Selesai</button>
+                                </form>
                             </div>
                         </div>
                         <!-- keranjang end -->
@@ -173,42 +181,9 @@ if ($_SESSION["is_login"] == false) {
     <!-- Page level custom scripts -->
     <!-- <script src="../js/demo/datatables-demo.js"></script> -->
 
+    <script src="../js/kasir-2.js"></script>
+    <!-- <script src="../js/kasir.js"></script> -->
     <script>
-        function tambahKeKeranjang(barangId, namaBarang, hargaSatuan) {
-            const keranjangContainer = document.getElementById('keranjangContainer');
-
-            // Cek apakah produk sudah ada di keranjang
-            const existingItem = Array.from(keranjangContainer.children).find(item => item.getAttribute('data-id') === barangId);
-
-            if (existingItem) {
-                // Jika ada, perbarui jumlah dan total harga
-                const jumlahElement = existingItem.querySelector('.jumlahBarang');
-                const totalHargaElement = existingItem.querySelector('.totalHarga');
-
-                let jumlah = parseInt(jumlahElement.innerText);
-                jumlah++;
-                jumlahElement.innerText = jumlah;
-
-                const totalHarga = jumlah * hargaSatuan;
-                totalHargaElement.innerText = totalHarga;
-            } else {
-                // Jika belum ada, buat item baru di keranjang
-                const keranjangItem = document.createElement('div');
-                keranjangItem.classList.add('card', 'w-100', 'd-flex', 'p-2', 'm-1');
-                keranjangItem.setAttribute('data-id', barangId); // Set ID produk
-
-                keranjangItem.innerHTML = `
-            <h5 class="text-dark">${namaBarang}</h5>
-            <p>Jumlah: <span class="jumlahBarang">1</span></p>
-            <p>Harga Satuan: Rp ${hargaSatuan}</p>
-            <p>Total Harga: Rp <span class="totalHarga">${hargaSatuan}</span></p>
-        `;
-
-                keranjangContainer.appendChild(keranjangItem);
-            }
-        }
-
-
         $(document).ready(function () {
             // cari nama barang
             $('#searchInput').on('keyup', function () {
@@ -230,10 +205,10 @@ if ($_SESSION["is_login"] == false) {
                                             <h5 class="text-dark">${item.nama}</h5>
                                             <p class="text-dark">Rp ${item.harga_satuan}</p>
                                          <button onclick="tambahKeKeranjang('${item.barang_id}', '${item.nama}', ${item.harga_satuan})" 
-            class="rounded rounded-5 btn btn-primary w-50 m-auto">
-        <i class="fas fa-tada"></i> <i class="fas fa-plus"></i>
-    </button>
-                                        </div>
+                                            class="rounded rounded-5 btn btn-primary w-50 m-auto">
+                                            <i class="fas fa-tada"></i> <i class="fas fa-plus"></i>
+                                        </button>
+                                    </div>
                                 `;
                                 });
                             } else {
@@ -242,86 +217,50 @@ if ($_SESSION["is_login"] == false) {
                             $('#resultContainer').html(html);
                         }
                     });
-                } else {
-                    $('#resultContainer').html('Cari nama barang di search bar...');
                 }
             });
 
+            // selesaikan transaksi
+            $('#btnSelesai').on('click', function (e) {
+                e.preventDefault(); // Mencegah form submit default
 
+                // Ambil semua data-id dan data-jumlah-keluar dari setiap item dalam keranjangContainer
+                // Array untuk menampung barangId dan jumlahKeluar
+                let barangIds = [];
+                let jumlahKeluar = [];
+                // Ambil data barangId dan jumlahKeluar dari setiap item dalam keranjangContainer
+                $('#keranjangContainer .card').each(function () {
+                    let barangId = $(this).attr('data-id'); // Ambil data-id
+                    let jumlah = $(this).attr('data-jumlah-keluar'); // Ambil data-jumlah-keluar
+                    barangIds.push(barangId);
+                    jumlahKeluar.push(jumlah); // Simpan jumlahKeluar sesuai urutan barangId
+                });
 
-            // Tambah Barang
-            $('#tambahkanBarang').click(function () {
-                var data = $('#formTambahBarang').serialize();
+                // Ambil total harga
+                let totalHarga = $('#totalHargaSemuaBarang').text().replace('Rp ', '').replace('.', '');
+
                 $.ajax({
-                    url: '../service/ajax/ajax-barang-masuk.php',
+                    url: '../service/ajax/ajax-kasir.php',
                     type: 'POST',
-                    data: data,
+                    data: {
+                        barangIds: barangIds,
+                        jumlahKeluar: jumlahKeluar,
+                        totalHarga: totalHarga
+                    },
                     success: function (response) {
-                        $('#modalTambahBarang').modal('hide');
-                        table.ajax.reload();
-                        $('#formTambahBarang')[0].reset();
-                        alert(response);
+                        alert(response); // Menampilkan respons dari server
+
+                        // Reset keranjang setelah berhasil mengirim data
+                        $('#keranjangContainer').empty(); // Menghapus semua barang di keranjang
+                        $('#totalHargaSemuaBarang').text('Rp 0'); // Reset total harga
+
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        alert("Gagal mengirim data: " + textStatus);
                     }
                 });
             });
 
-            // Menampilkan modal Edit barang masuk
-            $('#tableBarangMasuk').on('click', '.edit', function () {
-                let barang_masuk_id = $(this).data('barang_masuk_id');
-                let barang_id = $(this).data('barang_id');
-
-                $.ajax({
-                    url: '../service/ajax/ajax-barang-masuk.php?barang_masuk_id=' + barang_masuk_id + '&' + 'barang_id=' + barang_id,
-                    type: 'GET',
-                    dataType: 'json',
-                    success: function (data) {
-                        $('#edit_barang_masuk_id').val(data.barang_masuk_id);
-                        $('#edit_barang_id').val(data.barang_id);
-                        $('#edit_nama').val(data.nama);
-                        $('#edit_nomor_bacth').val(data.nomor_bacth);
-                        $('#edit_tanggal_masuk').val(data.tanggal_masuk);
-                        $('#edit_jumlah_masuk').val(data.jumlah_masuk);
-                        $('#edit_exp').val(data.exp);
-                        $('#edit_supplier').val(data.supplier);
-                        $('#edit_keterangan').val(data.keterangan);
-                        $('#modalEditBarangMasuk').modal('show');
-                    }
-                });
-            });
-
-            // Menyimpan edit
-            $('#simpanEdit').click(function () {
-                var data = $('#formEditBarangMasuk').serialize();
-                $.ajax({
-                    url: '../service/ajax/ajax-barang-masuk.php',
-                    type: 'PUT',
-                    data: data,
-                    success: function (response) {
-                        $('#modalEditBarangMasuk').modal('hide');
-                        table.ajax.reload();
-                        $('#formEditBarangMasuk')[0].reset();
-                        alert(response);
-                    }
-                });
-            });
-
-            // Delete barang masuk
-            $('#tableBarangMasuk').on('click', '.delete', function () {
-                var barang_masuk_id = $(this).data('barang_masuk_id');
-                if (confirm('Kamu yakin ingin menghapus data tambah barang ini?')) {
-                    $.ajax({
-                        url: '../service/ajax/ajax-barang-masuk.php',
-                        type: 'DELETE',
-                        data: {
-                            barang_masuk_id: barang_masuk_id
-                        },
-                        success: function (response) {
-                            table.ajax.reload();
-                            alert(response);
-                        }
-                    });
-                }
-            });
         });
 
     </script>

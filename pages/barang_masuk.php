@@ -232,12 +232,13 @@ if ($_SESSION["is_login"] == false) {
                                                 </select>
                                             </div> -->
 
-                                            <input type="text" name="barang_masuk_id" id="edit_barang_masuk_id">
+                                            <input type="hidden" name="barang_masuk_id" id="edit_barang_masuk_id">
                                             <div class="form-group">
                                                 <label for="edit_barang_id">Pilih Barang :</label>
-                                                <input type="text" class="form-control" id="edit_barang_id"
+                                                <input type="hidden" class="form-control" id="edit_barang_id"
                                                     name="barang_id">
-                                                <input type="text" class="form-control" id="edit_nama" name="nama">
+                                                <input type="text" class="form-control" id="edit_nama" name="nama"
+                                                    disabled>
                                             </div>
                                             <div class="form-group">
                                                 <label for="edit_nomor_bacth">Nomor Bacth :</label>

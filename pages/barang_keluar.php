@@ -72,7 +72,7 @@ if ($_SESSION["is_login"] == false) {
                                 <!-- btn trigger modal tambah barang masuk -->
                                 <!-- <button type="button" class="btn btn-primary my-2" data-toggle="modal"
                                     data-target="#modalTambahBarang">
-                                    Tambah Barang Keluar
+                                    Tambah Barang
                                 </button> -->
                                 <a href="#0" class="btn btn-sm my-2 py-2 btn-info">
                                     <i class="fas fa-download fa-sm text-white-50"></i> Unduh Excel
@@ -82,17 +82,17 @@ if ($_SESSION["is_login"] == false) {
 
                         <div class="card-body">
                             <div class="table-responsive">
-                                <table class="table table-bordered text-dark" id="tableBarangMasuk" width="100%"
+                                <table class="table table-bordered text-dark" id="tableBarangKeluar" width="100%"
                                     cellspacing="0">
                                     <thead>
                                         <tr>
                                             <th>No</th>
                                             <th>Nama</th>
-                                            <th>Nomor Bacth</th>
-                                            <th>Tanggal Masuk</th>
-                                            <th>Jumlah Masuk</th>
-                                            <th>Exp</th>
-                                            <th>Supplier</th>
+                                            <th>Kategori</th>
+                                            <th>Jumlah Keluar</th>
+                                            <th>Harga Satuan</th>
+                                            <th>Total Harga</th>
+                                            <th>Tanggal Keluar</th>
                                             <th>Keterangan</th>
                                             <th>Aksi</th>
                                         </tr>
@@ -103,79 +103,7 @@ if ($_SESSION["is_login"] == false) {
                             </div>
                         </div>
 
-                        <!-- Modal tambah barang masuk start -->
-                        <div class="modal fade" id="modalTambahBarang">
-                            <div class="modal-dialog">
-                                <div class="modal-content text-dark">
-                                    <div class="modal-header">
-                                        <h4 class="modal-title">Tambah Barang</h4>
-                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                            <span aria-hidden="true">&times;</span>
-                                        </button>
-                                    </div>
-                                    <form id="formTambahBarang">
-                                        <div class="modal-body">
-                                            <div class="form-group">
-                                                <label for="pilih_barang">Pilih Barang :</label>
-                                                <select class="form-control select2" name="pilih_barang"
-                                                    id="pilih_barang" style="width: 100%;">
-                                                    <?php
-                                                    $results_all_barang = $connected->query("SELECT * FROM barang");
-                                                    if ($results_all_barang->num_rows > 0) {
-                                                        while ($data_semua_barang = $results_all_barang->fetch_assoc()) {
-                                                            ?>
-                                                            <!-- <input type="hidden" value="<= $data_semua_barang['barang_id'] ?>"> -->
-                                                            <option value="<?= $data_semua_barang['barang_id'] ?>">
-                                                                <?= $data_semua_barang['nama'] ?>
-                                                            </option>
-                                                        <?php }
-                                                    } ?>
-                                                </select>
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="nomor_bacth">Nomor Bacth :</label>
-                                                <input type="text" class="form-control" id="nomor_bacth"
-                                                    name="nomor_bacth">
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="tanggal_masuk">Tanggal Masuk :</label>
-                                                <input type="date" class="form-control" id="tanggal_masuk"
-                                                    name="tanggal_masuk">
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="jumlah_masuk">Jumlah Masuk :</label>
-                                                <input type="number" class="form-control" id="jumlah_masuk"
-                                                    name="jumlah_masuk">
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="exp">Exp :</label>
-                                                <input type="date" class="form-control" id="exp" name="exp">
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="supplier">Supplier :</label>
-                                                <input type="text" class="form-control" id="supplier" name="supplier">
-                                            </div>
-                                            <div class="form-floating">
-                                                <label for="keterangan">
-                                                    Keterangan :
-                                                </label>
-                                                <textarea class="form-control" id="keterangan" name="keterangan"
-                                                    style="height: 85px; resize: none;"></textarea>
-                                            </div>
-                                        </div>
-                                        <div class="modal-footer justify-content-between">
-                                            <button type="button" class="btn btn-primary" name="tambahkanBarang"
-                                                id="tambahkanBarang">Tambahkan</button>
-                                        </div>
-                                    </form>
-                                </div>
-                                <!-- /.modal-content -->
-                            </div>
-                            <!-- /.modal-dialog -->
-                        </div>
-                        <!-- Modal tambah barang masuk End -->
-
-                        <!-- Modal edit barang masuk start -->
+                        <!-- Modal edit barang keluar start -->
                         <div class="modal fade" id="modalEditBarangMasuk">
                             <div class="modal-dialog">
                                 <div class="modal-content text-dark">
@@ -187,32 +115,6 @@ if ($_SESSION["is_login"] == false) {
                                     </div>
                                     <form id="formEditBarangMasuk">
                                         <div class="modal-body">
-                                            <!-- <div class="form-group">
-                                                <input type="text" name="barang_id" id="edit_barang_id"
-                                                    value="<= $barang_masuk_id ?>">
-                                                <label for="pilih_barang">Pilih Barang :</label>
-                                                <select class="form-control select2" name="pilih_barang"
-                                                    id="pilih_barang" style="width: 100%;">
-                                                    <php
-
-                                                    
-                                                    // Ambil barang_id dari tabel barang_masuk berdasarkan id yang sedang diedit
-                                                    $barang_masuk_id = 1; // Sesuaikan dengan id barang_masuk yang sedang diedit atau bisa dinamis
-                                                    $result_barang_masuk = $connected->query("SELECT barang_id FROM barang_masuk WHERE barang_masuk_id = $barang_masuk_id");
-                                                    $selected_barang_id = ($result_barang_masuk->num_rows > 0) ? $result_barang_masuk->fetch_assoc()['barang_id'] : null;
-
-
-                                                    $results_all_barang = $connected->query("SELECT * FROM barang");
-                                                    if ($results_all_barang->num_rows > 0) {
-                                                        while ($data_semua_barang = $results_all_barang->fetch_assoc()) {
-                                                            ?>
-                                                            <option value="<= $data_semua_barang['barang_id'] ?>">
-                                                                <= $data_semua_barang['nama'] ?>
-                                                            </option>
-                                                        <php }
-                                                    } ?>
-                                                </select>
-                                            </div> -->
 
                                             <input type="text" name="barang_masuk_id" id="edit_barang_masuk_id">
                                             <div class="form-group">
@@ -235,6 +137,8 @@ if ($_SESSION["is_login"] == false) {
                                                 <label for="edit_jumlah_masuk">Jumlah Masuk :</label>
                                                 <input type="number" class="form-control" id="edit_jumlah_masuk"
                                                     name="jumlah_masuk">
+                                                <input type="hidden" class="form-control" id="edit_jumlah_masuk_old"
+                                                    name="jumlah_masuk_old">
                                             </div>
                                             <div class="form-group">
                                                 <label for="edit_exp">Exp :</label>
@@ -263,7 +167,7 @@ if ($_SESSION["is_login"] == false) {
                             </div>
                             <!-- /.modal-dialog -->
                         </div>
-                        <!-- Modal edit barang masuk End -->
+                        <!-- Modal edit barang keluar End -->
 
                     </div>
 
@@ -335,13 +239,17 @@ if ($_SESSION["is_login"] == false) {
     <script src="../vendor/datatables/jquery.dataTables.min.js"></script>
     <script src="../vendor/datatables/dataTables.bootstrap4.min.js"></script>
 
+    <!-- Include Select2 CSS and JS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+
     <!-- Page level custom scripts -->
     <!-- <script src="../js/demo/datatables-demo.js"></script> -->
 
     <script>
         $(document).ready(function () {
-            var table = $('#tableBarangMasuk').DataTable({
-                "ajax": "../service/ajax/ajax-barang-masuk.php",
+            var table = $('#tableBarangKeluar').DataTable({
+                "ajax": "../service/ajax/ajax-barang-keluar.php",
                 "columns": [{
                     "data": "no"
                 },
@@ -349,19 +257,19 @@ if ($_SESSION["is_login"] == false) {
                     "data": "nama"
                 },
                 {
-                    "data": "nomor_bacth"
+                    "data": "kategori"
                 },
                 {
-                    "data": "tanggal_masuk"
+                    "data": "jumlah_keluar"
                 },
                 {
-                    "data": "jumlah_masuk"
+                    "data": "harga_satuan"
                 },
                 {
-                    "data": "exp"
+                    "data": "total_harga"
                 },
                 {
-                    "data": "supplier"
+                    "data": "tanggal_keluar"
                 },
                 {
                     "data": "keterangan"
@@ -392,20 +300,22 @@ if ($_SESSION["is_login"] == false) {
             });
 
             // Menampilkan modal Edit barang masuk
-            $('#tableBarangMasuk').on('click', '.edit', function () {
+            $('#tableBarangKeluar').on('click', '.edit', function () {
                 let barang_masuk_id = $(this).data('barang_masuk_id');
+                let barang_id = $(this).data('barang_id');
+
                 $.ajax({
-                    url: '../service/ajax/ajax-barang-masuk.php?barang_masuk_id=' + barang_masuk_id + '&barang_id=' + barang_id,
+                    url: '../service/ajax/ajax-barang-masuk.php?barang_masuk_id=' + barang_masuk_id + '&' + 'barang_id=' + barang_id,
                     type: 'GET',
                     dataType: 'json',
                     success: function (data) {
                         $('#edit_barang_masuk_id').val(data.barang_masuk_id);
                         $('#edit_barang_id').val(data.barang_id);
                         $('#edit_nama').val(data.nama);
-                        // $('#edit_nama').val(data.nama);
                         $('#edit_nomor_bacth').val(data.nomor_bacth);
                         $('#edit_tanggal_masuk').val(data.tanggal_masuk);
                         $('#edit_jumlah_masuk').val(data.jumlah_masuk);
+                        $('#edit_jumlah_masuk_old').val(data.jumlah_masuk);
                         $('#edit_exp').val(data.exp);
                         $('#edit_supplier').val(data.supplier);
                         $('#edit_keterangan').val(data.keterangan);
@@ -422,7 +332,7 @@ if ($_SESSION["is_login"] == false) {
                     type: 'PUT',
                     data: data,
                     success: function (response) {
-                        $('#modalEdit').modal('hide');
+                        $('#modalEditBarangMasuk').modal('hide');
                         table.ajax.reload();
                         $('#formEditBarangMasuk')[0].reset();
                         alert(response);
@@ -431,7 +341,7 @@ if ($_SESSION["is_login"] == false) {
             });
 
             // Delete barang masuk
-            $('#tableBarangMasuk').on('click', '.delete', function () {
+            $('#tableBarangKeluar').on('click', '.delete', function () {
                 var barang_masuk_id = $(this).data('barang_masuk_id');
                 if (confirm('Kamu yakin ingin menghapus data tambah barang ini?')) {
                     $.ajax({
