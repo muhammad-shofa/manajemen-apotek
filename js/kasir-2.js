@@ -99,3 +99,4 @@ function updateTotalHarga() {
   // Tampilkan total harga semua barang
   totalHargaSemuaBarangElement.innerText = "Rp " + totalHarga;
 }
+// });

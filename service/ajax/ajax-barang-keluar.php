@@ -7,17 +7,17 @@ include "../delete.php";
 session_start();
 
 if ($_SERVER["REQUEST_METHOD"] == "GET") {
-    if (isset($_GET["barang_masuk_id"])) {
-        if (isset($_GET["barang_masuk_id"]) && isset($_GET['barang_id'])) {
+    if (isset($_GET["barang_keluar_id"])) {
+        if (isset($_GET["barang_keluar_id"]) && isset($_GET['barang_id'])) {
             $barang_id = $_GET['barang_id'];
             $sql_nama_barang = $connected->query("SELECT nama FROM barang WHERE barang_id = $barang_id");
             if ($sql_nama_barang->num_rows > 0) {
                 $data_nama = $sql_nama_barang->fetch_assoc();
             }
         }
-        $barang_masuk_id = $_GET["barang_masuk_id"];
-        $stmt = $connected->prepare($select->selectTable($table_name = "barang_masuk", $fields = "*", $condition = "WHERE barang_masuk_id = ?"));
-        $stmt->bind_param("i", $barang_masuk_id);
+        $barang_keluar_id = $_GET["barang_keluar_id"];
+        $stmt = $connected->prepare($select->selectTable($table_name = "barang_keluar", $fields = "*", $condition = "WHERE barang_keluar_id = ?"));
+        $stmt->bind_param("i", $barang_keluar_id);
         $stmt->execute();
         $result = $stmt->get_result();
         $data = $result->fetch_assoc();
@@ -65,7 +65,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
     $supplier = $_POST["supplier"];
     $keterangan = $_POST["keterangan"];
 
-    $stmt = $connected->prepare($insert->selectTable($table_name = "barang_masuk", $condition = "(barang_id, nomor_bacth, tanggal_masuk, jumlah_masuk, exp, supplier, keterangan) VALUES (?, ?, ?, ?, ?, ?, ?)"));
+    $stmt = $connected->prepare($insert->selectTable($table_name = "barang_keluar", $condition = "(barang_id, nomor_bacth, tanggal_masuk, jumlah_masuk, exp, supplier, keterangan) VALUES (?, ?, ?, ?, ?, ?, ?)"));
     $stmt->bind_param("ississs", $barang_id, $nomor_bacth, $tanggal_masuk, $jumlah_masuk, $exp, $supplier, $keterangan);
 
     if ($stmt->execute()) {
@@ -90,75 +90,115 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
     $stmt->close();
 } else if ($_SERVER["REQUEST_METHOD"] == "PUT") {
     parse_str(file_get_contents("php://input"), $data);
-    $barang_masuk_id = htmlspecialchars($data["barang_masuk_id"]); // i
+    // Ambil data dari input yang akan digunakan untuk update barang_keluar
+    $barang_keluar_id = htmlspecialchars($data["barang_keluar_id"]); // i
     $barang_id = htmlspecialchars($data["barang_id"]); // i
-    $nomor_bacth = htmlspecialchars($data["nomor_bacth"]);
-    $tanggal_masuk = htmlspecialchars($data["tanggal_masuk"]);
-    $jumlah_masuk = htmlspecialchars($data["jumlah_masuk"]); // i 
-    $jumlah_masuk_old = htmlspecialchars($data["jumlah_masuk_old"]); // i untuk mengurangi stok pada tabel barang lalu ditambahkan dengan jumlah masuk yang baru
-    $exp = htmlspecialchars($data["exp"]);
-    if (empty($exp)) {
-        $exp = NULL;
-    }
-    $supplier = htmlspecialchars($data["supplier"]);
+    $kategori = htmlspecialchars($data["kategori"]);
+    $jumlah_keluar = htmlspecialchars($data["jumlah_keluar"]); // i
+    $jumlah_keluar_old = htmlspecialchars($data["jumlah_keluar_old"]); // i untuk menyesuaikan stok pada tabel barang lalu ditambahkan/dikurangi sesuai jumlah_keluar baru
+    $harga_satuan = htmlspecialchars($data["harga_satuan"]);
+    $total_harga = htmlspecialchars($data["total_harga"]);
+    $tanggal_keluar = htmlspecialchars($data["tanggal_keluar"]);
     $keterangan = htmlspecialchars($data["keterangan"]);
 
-    // update data pada tabel barang_masuk
-    $stmt_barang_masuk = $connected->prepare($update->selectTable($table_name = "barang_masuk", $condition = "nomor_bacth = ?, tanggal_masuk = ?, jumlah_masuk = ?, exp = ?, supplier = ?, keterangan = ? WHERE barang_masuk_id = ?"));
-    $stmt_barang_masuk->bind_param("ssisssi", $nomor_bacth, $tanggal_masuk, $jumlah_masuk, $exp, $supplier, $keterangan, $barang_masuk_id);
+    // Step 1: Ambil stok saat ini dan jumlah_keluar awal dari database
+    $barang_keluar_id = htmlspecialchars($data["barang_keluar_id"]);
+    $jumlah_keluar_baru = htmlspecialchars($data["jumlah_keluar"]);
 
-    // ambil stok pada barang masuk lalu kurangi dengan jumlah_masuk_old
-    $result_stok_barang = $connected->query("SELECT stok FROM barang WHERE barang_id = $barang_id");
-    $jumlah_stok_barang = $result_stok_barang->fetch_assoc()['stok'];
+    $stmt_select = $connected->prepare("SELECT jumlah_keluar, barang_id FROM barang_keluar WHERE barang_keluar_id = ?");
+    $stmt_select->bind_param("i", $barang_keluar_id);
+    $stmt_select->execute();
+    $result = $stmt_select->get_result();
+    $row = $result->fetch_assoc();
 
-    // kurangi stok barang saat ini dengan jumlah_masuk_old
-    $jumlah_real_stok_barang = (int) $jumlah_stok_barang - (int) $jumlah_masuk_old + (int) $jumlah_masuk;
+    $jumlah_keluar_awal = $row['jumlah_keluar'];
+    $barang_id = $row['barang_id'];
 
-    // update jumlah_real_stok_barang ke tabel barang
-    $stmt_stok_barang = $connected->prepare($update->selectTable($table_name = "barang", $condition = "stok = ? WHERE barang_id = ?"));
-    $stmt_stok_barang->bind_param("ii", $jumlah_real_stok_barang, $barang_id);
+    // Step 2: Hitung selisih jumlah_keluar
+    $selisih = $jumlah_keluar_awal - $jumlah_keluar_baru; // Selisih bisa positif atau negatif
 
-    if ($stmt_barang_masuk->execute() && $stmt_stok_barang->execute()) {
-        echo "Berhasil mengedit data barang masuk";
+    // Step 3: Update stok di tabel barang
+    $stmt_stok = $connected->prepare("UPDATE barang SET stok = stok + ? WHERE barang_id = ?");
+    $stmt_stok->bind_param("ii", $selisih, $barang_id);
+
+    if ($stmt_stok->execute()) {
+        // Step 4: Update jumlah_keluar di tabel barang_keluar
+        $stmt_update_barang_keluar = $connected->prepare("UPDATE barang_keluar SET jumlah_keluar = ? WHERE barang_keluar_id = ?");
+        $stmt_update_barang_keluar->bind_param("ii", $jumlah_keluar_baru, $barang_keluar_id);
+
+        if ($stmt_update_barang_keluar->execute()) {
+            echo "Berhasil memperbarui jumlah keluar dan stok barang.";
+        } else {
+            echo "Gagal memperbarui jumlah keluar: " . $stmt_update_barang_keluar->error;
+        }
     } else {
-        echo "Gagal mengedit data barang masuk " . $stmt->error;
+        echo "Gagal memperbarui stok barang: " . $stmt_stok->error;
     }
 
-    $stmt_barang_masuk->close();
-    $stmt_stok_barang->close();
-} else if ($_SERVER["REQUEST_METHOD"] == "DELETE") {
-    // Hapus barang masuk
-    parse_str(file_get_contents("php://input"), $data);
-    $barang_masuk_id = $data["barang_masuk_id"];
+    // Tutup statement
+    $stmt_select->close();
+    $stmt_stok->close();
+    $stmt_update_barang_keluar->close();
 
-    // Langkah 1: Ambil barang_id dan jumlah_masuk dari tabel barang_masuk sebelum dihapus
-    $select_stmt = $connected->prepare("SELECT barang_id, jumlah_masuk FROM barang_masuk WHERE barang_masuk_id = ?");
-    $select_stmt->bind_param("i", $barang_masuk_id);
+
+    // Update data pada tabel barang_keluar
+    // $stmt_barang_keluar = $connected->prepare("UPDATE barang_keluar SET kategori = ?, jumlah_keluar = ?, harga_satuan = ?, total_harga = ?, tanggal_keluar = ?, keterangan = ? WHERE barang_keluar_id = ?");
+    // $stmt_barang_keluar->bind_param("siiissi", $kategori, $jumlah_keluar, $harga_satuan, $total_harga, $tanggal_keluar, $keterangan, $barang_keluar_id);
+
+    // // Ambil stok barang dari tabel barang sebelum melakukan perubahan
+    // $result_stok_barang = $connected->query("SELECT stok FROM barang WHERE barang_id = $barang_id");
+    // $jumlah_stok_barang = $result_stok_barang->fetch_assoc()['stok'];
+
+    // // Hitung stok baru: kurangi stok saat ini dengan jumlah_keluar_old, lalu tambahkan jumlah_keluar yang baru
+    // $jumlah_real_stok_barang = (int) $jumlah_stok_barang - (int) $jumlah_keluar_old + (int) $jumlah_keluar;
+
+    // // Update stok baru ke tabel barang
+    // $stmt_stok_barang = $connected->prepare("UPDATE barang SET stok = ? WHERE barang_id = ?");
+    // $stmt_stok_barang->bind_param("ii", $jumlah_real_stok_barang, $barang_id);
+
+    // // Eksekusi query dan cek keberhasilan
+    // if ($stmt_barang_keluar->execute() && $stmt_stok_barang->execute()) {
+    //     echo "Berhasil mengedit data barang keluar dan memperbarui stok barang.";
+    // } else {
+    //     echo "Gagal mengedit data barang keluar: " . $stmt_barang_keluar->error;
+    // }
+
+    // // Tutup statement
+    // $stmt_barang_keluar->close();
+    // $stmt_stok_barang->close();
+} else if ($_SERVER["REQUEST_METHOD"] == "DELETE") {
+    // Hapus barang keluar
+    parse_str(file_get_contents("php://input"), $data);
+    $barang_keluar_id = $data["barang_keluar_id"];
+
+    // Langkah 1: Ambil barang_id dan jumlah_keluar dari tabel barang_keluar sebelum dihapus
+    $select_stmt = $connected->prepare("SELECT barang_id, jumlah_keluar FROM barang_keluar WHERE barang_keluar_id = ?");
+    $select_stmt->bind_param("i", $barang_keluar_id);
     $select_stmt->execute();
     $result = $select_stmt->get_result();
 
     if ($result->num_rows > 0) {
         $row = $result->fetch_assoc();
         $barang_id = $row['barang_id'];
-        $jumlah_masuk = $row['jumlah_masuk'];
+        $jumlah_keluar = $row['jumlah_keluar'];
 
-        // Langkah 2: Kurangi stok barang di tabel barang
-        $update_stmt = $connected->prepare("UPDATE barang SET stok = stok - ? WHERE barang_id = ?");
-        $update_stmt->bind_param("ii", $jumlah_masuk, $barang_id);
+        // Langkah 2: Tambah stok barang di tabel barang
+        $update_stmt = $connected->prepare("UPDATE barang SET stok = stok + ? WHERE barang_id = ?");
+        $update_stmt->bind_param("ii", $jumlah_keluar, $barang_id);
 
         if ($update_stmt->execute()) {
-            // Langkah 3: Jika stok berhasil dikurangi, hapus data dari tabel barang_masuk
-            $stmt = $connected->prepare("DELETE FROM barang_masuk WHERE barang_masuk_id = ?");
-            $stmt->bind_param("i", $barang_masuk_id);
+            // Langkah 3: Jika stok berhasil ditambahkan, hapus data dari tabel barang_keluar
+            $delete_stmt = $connected->prepare("DELETE FROM barang_keluar WHERE barang_keluar_id = ?");
+            $delete_stmt->bind_param("i", $barang_keluar_id);
 
-            if ($stmt->execute()) {
-                echo "Berhasil menghapus barang masuk dan stok telah diperbarui.";
+            if ($delete_stmt->execute()) {
+                echo "Berhasil menghapus barang keluar dan stok telah diperbarui.";
             } else {
-                // Jika gagal menghapus dari tabel barang_masuk
-                echo "Gagal menghapus dari barang_masuk: " . $stmt->error;
+                // Jika gagal menghapus dari tabel barang_keluar
+                echo "Gagal menghapus dari barang_keluar: " . $delete_stmt->error;
             }
 
-            $stmt->close();
+            $delete_stmt->close();
         } else {
             // Jika gagal memperbarui stok
             echo "Gagal memperbarui stok: " . $update_stmt->error;
@@ -166,8 +206,8 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
 
         $update_stmt->close();
     } else {
-        // Jika data tidak ditemukan di tabel barang_masuk
-        echo "Data tidak ditemukan untuk barang_masuk_id: " . $barang_masuk_id;
+        // Jika data tidak ditemukan di tabel barang_keluar
+        echo "Data tidak ditemukan untuk barang_keluar_id: " . $barang_keluar_id;
     }
 
     $select_stmt->close();
@@ -177,41 +217,6 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
 
 
 
-// else if ($_SERVER["REQUEST_METHOD"] == "DELETE") {
-//     // Delete barang
-//     parse_str(file_get_contents("php://input"), $data);
-//     $barang_masuk_id = $data["barang_masuk_id"];
 
-//     $stmt = $connected->prepare($delete->select_table($table_name = "barang_masuk", $condition = "WHERE barang_masuk_id = ?"));
-//     $stmt->bind_param("i", $barang_masuk_id);
-
-//     if ($stmt->execute()) {
-//         echo "Berhasil menghapus";
-//     } else {
-//         echo "Gagal menghapus: " . $stmt->error;
-//     }
-
-//     $stmt->close();
-// }
-
-// else if ($_SERVER["REQUEST_METHOD"] == "PUT") {
-//     // Update 
-//     parse_str(file_get_contents("php://input"), $data);
-//     $temuan_id = $data["temuan_id"];
-//     $rekomendasi_tindak_lanjut = $data["rekomendasi_tindak_lanjut"];
-//     $status = $data["status"];
-//     $dokumentasi_tl = $data["dokumentasi_tl"];
-
-//     $stmt = $connected->prepare($update->selectTable($table_name = "temuan", $condition = "rekomendasi_tindak_lanjut = ?, status = ?, dokumentasi_tl = ? WHERE temuan_id = ?"));
-//     $stmt->bind_param("sssi", $rekomendasi_tindak_lanjut, $status, $dokumentasi_tl, $temuan_id);
-
-//     if ($stmt->execute()) {
-//         echo "Berhasil mengupdate";
-//     } else {
-//         echo "Gagal mengupdate " . $stmt->error;
-//     }
-
-//     $stmt->close();
-// }
 
 

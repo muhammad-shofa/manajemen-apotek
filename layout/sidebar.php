@@ -2,11 +2,10 @@
 <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
 
     <!-- Sidebar - Brand -->
-    <a class="sidebar-brand d-flex align-items-center justify-content-center" href="../index.php">
-        <div class="sidebar-brand-icon">
-            <i class="fas fa-laugh-wink"></i>
-            <h6><b>Manajemen Apotek</b></h6>
-        </div>
+    <a class="sidebar-brand d-flex align-items-center justify-content-center py-3" href="../index.php">
+        <!-- <div class="sidebar-brand-icon py-3"> -->
+        <h6 class="mt-3"><b>Manajemen Apotek Senori Farma</b></h6>
+        <!-- </div> -->
     </a>
 
     <!-- Divider -->
@@ -50,7 +49,7 @@
     <!-- Nav Item -->
     <li class="nav-item">
         <a class="nav-link" href="history.php">
-            <i class="fas fa-arrow-circle-down"></i>
+            <i class="fa fa-history"></i>
             <span>History</span></a>
     </li>
 

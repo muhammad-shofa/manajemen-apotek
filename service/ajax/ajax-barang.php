@@ -68,11 +68,12 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
     $nama = $data["nama"];
     $kategori = $data["kategori"];
     $harga_satuan = $data["harga_satuan"]; // i
+    $harga_butir = $data["harga_butir"]; // i
     $stok = $data["stok"]; // i
     $satuan = $data["satuan"];
 
-    $stmt = $connected->prepare($update->selectTable($table_name = "barang", $condition = "nama = ?, kategori = ?, harga_satuan = ?, stok = ?, satuan = ? WHERE barang_id = ?"));
-    $stmt->bind_param("ssiisi", $nama, $kategori, $harga_satuan, $stok, $satuan, $barang_id);
+    $stmt = $connected->prepare($update->selectTable($table_name = "barang", $condition = "nama = ?, kategori = ?, harga_satuan = ?, harga_butir = ?, stok = ?, satuan = ? WHERE barang_id = ?"));
+    $stmt->bind_param("ssiiisi", $nama, $kategori, $harga_satuan, $harga_butir, $stok, $satuan, $barang_id);
 
     if ($stmt->execute()) {
         echo "Berhasil mengedit data barang";

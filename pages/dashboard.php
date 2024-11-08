@@ -15,6 +15,14 @@ if ($_SESSION["is_login"] == false) {
 $results_total_stok = $connected->query("SELECT SUM(stok) AS total_stok FROM barang");
 $d_total_stok = mysqli_fetch_assoc($results_total_stok);
 
+// jumlah masuk
+$results_total_jumlah_masuk = $connected->query("SELECT SUM(jumlah_masuk) AS jumlah_masuk FROM barang_masuk");
+$d_total_jumlah_masuk = mysqli_fetch_assoc($results_total_jumlah_masuk);
+
+// jumlah keluar
+$results_total_jumlah_keluar = $connected->query("SELECT SUM(jumlah_keluar) AS jumlah_keluar FROM barang_keluar");
+$d_total_jumlah_keluar = mysqli_fetch_assoc($results_total_jumlah_keluar);
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -78,7 +86,7 @@ $d_total_stok = mysqli_fetch_assoc($results_total_stok);
                                         <div class="row no-gutters align-items-center">
                                             <div class="col mr-2">
                                                 <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                                                    Stok Barang</div>
+                                                    Semua Stok Barang</div>
                                                 <div class="h5 mb-0 font-weight-bold text-gray-800">
                                                     <?= $d_total_stok['total_stok'] ?>
                                                 </div>
@@ -94,97 +102,52 @@ $d_total_stok = mysqli_fetch_assoc($results_total_stok);
 
                         <!-- Barang Masuk -->
                         <div class="col-xl-3 col-md-6 mb-4">
-                            <div class="card border-left-info shadow h-100 py-2">
-                                <div class="card-body">
-                                    <div class="row no-gutters align-items-center">
-                                        <div class="col mr-2">
-                                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
-                                                Barang Masuk</div>
-                                            <div class="h5 mb-0 font-weight-bold text-gray-800">300</div>
-                                        </div>
-                                        <div class="col-auto">
-                                            <i class="fas fa-arrow-circle-down"></i>
+                            <a href="barang_masuk.php">
+                                <div class="card border-left-info shadow h-100 py-2">
+                                    <div class="card-body">
+                                        <div class="row no-gutters align-items-center">
+                                            <div class="col mr-2">
+                                                <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                                    Semua Barang Masuk</div>
+                                                <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                                    <?= $d_total_jumlah_masuk['jumlah_masuk'] ?>
+                                                </div>
+                                            </div>
+                                            <div class="col-auto">
+                                                <i class="fas fa-arrow-circle-down"></i>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </a>
                         </div>
 
                         <!-- Barang Keluar -->
                         <div class="col-xl-3 col-md-6 mb-4">
-                            <div class="card border-left-success shadow h-100 py-2">
-                                <div class="card-body">
-                                    <div class="row no-gutters align-items-center">
-                                        <div class="col mr-2">
-                                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
-                                                Barang Keluar</div>
-                                            <div class="h5 mb-0 font-weight-bold text-gray-800">260</div>
-                                        </div>
-                                        <div class="col-auto">
-                                            <i class="fas fa-arrow-circle-up"></i>
+                            <a href="barang_keluar.php">
+                                <div class="card border-left-success shadow h-100 py-2">
+                                    <div class="card-body">
+                                        <div class="row no-gutters align-items-center">
+                                            <div class="col mr-2">
+                                                <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                                    Semua Barang Keluar</div>
+                                                <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                                    <?= $d_total_jumlah_keluar['jumlah_keluar'] ?>
+                                                </div>
+                                            </div>
+                                            <div class="col-auto">
+                                                <i class="fas fa-arrow-circle-up"></i>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </a>
                         </div>
-
-                        <!-- Earnings (Monthly) Card Example
-                        <div class="col-xl-3 col-md-6 mb-4">
-                            <div class="card border-left-info shadow h-100 py-2">
-                                <div class="card-body">
-                                    <div class="row no-gutters align-items-center">
-                                        <div class="col mr-2">
-                                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Tasks
-                                            </div>
-                                            <div class="row no-gutters align-items-center">
-                                                <div class="col-auto">
-                                                    <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">50%</div>
-                                                </div>
-                                                <div class="col">
-                                                    <div class="progress progress-sm mr-2">
-                                                        <div class="progress-bar bg-info" role="progressbar"
-                                                            style="width: 50%" aria-valuenow="50" aria-valuemin="0"
-                                                            aria-valuemax="100"></div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-auto">
-                                            <i class="fas fa-clipboard-list fa-2x text-gray-300"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div> -->
-
-                        <!-- Pending Requests Card Example -->
-                        <!-- <div class="col-xl-3 col-md-6 mb-4">
-                            <div class="card border-left-warning shadow h-100 py-2">
-                                <div class="card-body">
-                                    <div class="row no-gutters align-items-center">
-                                        <div class="col mr-2">
-                                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
-                                                Pending Requests</div>
-                                            <div class="h5 mb-0 font-weight-bold text-gray-800">18</div>
-                                        </div>
-                                        <div class="col-auto">
-                                            <i class="fas fa-comments fa-2x text-gray-300"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div> -->
                     </div>
                 </div>
 
                 <!-- Footer -->
-                <footer class="sticky-footer bg-white">
-                    <div class="container my-auto">
-                        <div class="copyright text-center my-auto">
-                            <span>Copyright &copy; mshofadev 2024</span>
-                        </div>
-                    </div>
-                </footer>
+                <?php include "../layout/footer.php" ?>
                 <!-- End of Footer -->
 
             </div>

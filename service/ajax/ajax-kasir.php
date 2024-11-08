@@ -21,7 +21,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $jumlah = isset($jumlahKeluar[$index]) ? $jumlahKeluar[$index] : 0;
 
         // Ambil data barang dari tabel barang berdasarkan barang_id
-        $stmt = $connected->prepare("SELECT kategori, harga_satuan FROM barang WHERE barang_id = ?");
+        $stmt = $connected->prepare("SELECT kategori, harga_satuan, stok FROM barang WHERE barang_id = ?");
         $stmt->bind_param("i", $barang_id);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -32,6 +32,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             // Data barang yang dibutuhkan
             $kategori = $data_barang['kategori'];
             $harga_satuan = $data_barang['harga_satuan'];
+            $stok = $data_barang['stok']; // Stok yang tersedia
             $tanggal_keluar = date('Y-m-d');
             $keterangan = "Penjualan";
 
@@ -43,7 +44,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $insertStmt->bind_param("isidiss", $barang_id, $kategori, $jumlah, $harga_satuan, $total_harga_item, $tanggal_keluar, $keterangan);
 
             if ($insertStmt->execute()) {
+                // Mengurangi stok barang
+                $new_stok = $stok - $jumlah; // Mengurangi stok sesuai dengan jumlah keluar
+                $updateStmt = $connected->prepare("UPDATE barang SET stok = ? WHERE barang_id = ?");
+                $updateStmt->bind_param("ii", $new_stok, $barang_id);
+
+                $updateStmt->execute();
                 $transaksi_berhasil = "Transaksi Berhasil, Data telah masuk ke barang keluar. ";
+
+
+                $updateStmt->close();
             } else {
                 echo "Gagal menambahkan data untuk barang ID $barang_id: " . $insertStmt->error . "<br>";
             }

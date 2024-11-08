@@ -63,12 +63,13 @@ if (isset($_POST["masuk"])) {
                         <!-- Nested Row within Card Body -->
                         <div class="row">
                             <div class="col-lg-6 d-none d-lg-block text-center mt-5">
-                                <img src="img/undraw_rocket.svg" alt="rocket image" class="mt-5" width="250px">
+                                <img src="img/unit_medis.jpg" alt="rocket image" class="mt-5" width="400px">
                             </div>
                             <div class="col-lg-6">
                                 <div class="p-5 my-5">
                                     <div class="text-center">
-                                        <h1 class="h3 text-gray-900 mb-4">Selamat Datang di <b>Manajemen Apotek</b>!
+                                        <h1 class="h3 text-gray-900 mb-4">Selamat Datang di <b>Manajemen Apotek<br>
+                                                Senori Farma!</b>
                                         </h1>
                                     </div>
                                     <form class="user" method="post" action="">

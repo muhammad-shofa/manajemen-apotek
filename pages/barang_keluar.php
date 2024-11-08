@@ -104,7 +104,7 @@ if ($_SESSION["is_login"] == false) {
                         </div>
 
                         <!-- Modal edit barang keluar start -->
-                        <div class="modal fade" id="modalEditBarangMasuk">
+                        <div class="modal fade" id="modalEditBarangKeluar">
                             <div class="modal-dialog">
                                 <div class="modal-content text-dark">
                                     <div class="modal-header">
@@ -113,41 +113,43 @@ if ($_SESSION["is_login"] == false) {
                                             <span aria-hidden="true">&times;</span>
                                         </button>
                                     </div>
-                                    <form id="formEditBarangMasuk">
+                                    <form id="formEditBarangKeluar">
                                         <div class="modal-body">
-
-                                            <input type="text" name="barang_masuk_id" id="edit_barang_masuk_id">
+                                            <input type="hidden" name="barang_keluar_id" id="edit_barang_keluar_id">
                                             <div class="form-group">
-                                                <label for="edit_barang_id">Pilih Barang :</label>
-                                                <input type="text" class="form-control" id="edit_barang_id"
+                                                <label for="edit_barang_id">Nama Barang :</label>
+                                                <input type="hidden" class="form-control" id="edit_barang_id"
                                                     name="barang_id">
-                                                <input type="text" class="form-control" id="edit_nama" name="nama">
+                                                <input type="text" class="form-control" id="edit_nama" name="nama"
+                                                    disabled>
                                             </div>
                                             <div class="form-group">
-                                                <label for="edit_nomor_bacth">Nomor Bacth :</label>
-                                                <input type="text" class="form-control" id="edit_nomor_bacth"
-                                                    name="nomor_bacth">
+                                                <label for="edit_kategori">Kategori :</label>
+                                                <input type="text" class="form-control" id="edit_kategori"
+                                                    name="kategori">
                                             </div>
                                             <div class="form-group">
-                                                <label for="edit_tanggal_masuk">Tanggal Masuk :</label>
-                                                <input type="date" class="form-control" id="edit_tanggal_masuk"
-                                                    name="tanggal_masuk">
+                                                <label for="edit_jumlah_keluar">Jumlah Keluar :</label>
+                                                <input type="number" class="form-control" id="edit_jumlah_keluar"
+                                                    name="jumlah_keluar">
+                                                <input type="hidden" class="form-control" id="edit_jumlah_keluar_old"
+                                                    name="jumlah_keluar_old">
                                             </div>
                                             <div class="form-group">
-                                                <label for="edit_jumlah_masuk">Jumlah Masuk :</label>
-                                                <input type="number" class="form-control" id="edit_jumlah_masuk"
-                                                    name="jumlah_masuk">
-                                                <input type="hidden" class="form-control" id="edit_jumlah_masuk_old"
-                                                    name="jumlah_masuk_old">
+                                                <label for="edit_harga_satuan">Harga Satuan :</label>
+                                                <input type="number" class="form-control" id="edit_harga_satuan"
+                                                    name="harga_satuan">
                                             </div>
                                             <div class="form-group">
-                                                <label for="edit_exp">Exp :</label>
-                                                <input type="date" class="form-control" id="edit_exp" name="exp">
+                                                <label for="edit_total_harga">Total Harga :</label>
+                                                <input type="number" class="form-control" id="edit_total_harga"
+                                                    name="total_harga">
                                             </div>
+
                                             <div class="form-group">
-                                                <label for="edit_supplier">Supplier :</label>
-                                                <input type="text" class="form-control" id="edit_supplier"
-                                                    name="supplier">
+                                                <label for="edit_tanggal_keluar">Tanggal Keluar :</label>
+                                                <input type="date" class="form-control" id="edit_tanggal_keluar"
+                                                    name="tanggal_keluar">
                                             </div>
                                             <div class="form-floating">
                                                 <label for="edit_keterangan">
@@ -175,13 +177,7 @@ if ($_SESSION["is_login"] == false) {
                 <!-- /.container-fluid -->
 
                 <!-- Footer -->
-                <footer class="sticky-footer bg-white">
-                    <div class="container my-auto">
-                        <div class="copyright text-center my-auto">
-                            <span>Copyright &copy; mshofadev 2024</span>
-                        </div>
-                    </div>
-                </footer>
+                <?php include "../layout/footer.php" ?>
                 <!-- End of Footer -->
 
             </div>
@@ -284,57 +280,56 @@ if ($_SESSION["is_login"] == false) {
             });
 
             // Tambah Barang
-            $('#tambahkanBarang').click(function () {
-                var data = $('#formTambahBarang').serialize();
-                $.ajax({
-                    url: '../service/ajax/ajax-barang-masuk.php',
-                    type: 'POST',
-                    data: data,
-                    success: function (response) {
-                        $('#modalTambahBarang').modal('hide');
-                        table.ajax.reload();
-                        $('#formTambahBarang')[0].reset();
-                        alert(response);
-                    }
-                });
-            });
+            // $('#tambahkanBarang').click(function () {
+            //     var data = $('#formTambahBarang').serialize();
+            //     $.ajax({
+            //         url: '../service/ajax/ajax-barang-masuk.php',
+            //         type: 'POST',
+            //         data: data,
+            //         success: function (response) {
+            //             $('#modalTambahBarang').modal('hide');
+            //             table.ajax.reload();
+            //             $('#formTambahBarang')[0].reset();
+            //             alert(response);
+            //         }
+            //     });
+            // });
 
             // Menampilkan modal Edit barang masuk
             $('#tableBarangKeluar').on('click', '.edit', function () {
-                let barang_masuk_id = $(this).data('barang_masuk_id');
+                let barang_keluar_id = $(this).data('barang_keluar_id');
                 let barang_id = $(this).data('barang_id');
 
                 $.ajax({
-                    url: '../service/ajax/ajax-barang-masuk.php?barang_masuk_id=' + barang_masuk_id + '&' + 'barang_id=' + barang_id,
+                    url: '../service/ajax/ajax-barang-keluar.php?barang_keluar_id=' + barang_keluar_id + '&' + 'barang_id=' + barang_id,
                     type: 'GET',
                     dataType: 'json',
                     success: function (data) {
-                        $('#edit_barang_masuk_id').val(data.barang_masuk_id);
+                        $('#edit_barang_keluar_id').val(data.barang_keluar_id);
                         $('#edit_barang_id').val(data.barang_id);
                         $('#edit_nama').val(data.nama);
-                        $('#edit_nomor_bacth').val(data.nomor_bacth);
-                        $('#edit_tanggal_masuk').val(data.tanggal_masuk);
-                        $('#edit_jumlah_masuk').val(data.jumlah_masuk);
-                        $('#edit_jumlah_masuk_old').val(data.jumlah_masuk);
-                        $('#edit_exp').val(data.exp);
-                        $('#edit_supplier').val(data.supplier);
+                        $('#edit_kategori').val(data.kategori);
+                        $('#edit_jumlah_keluar').val(data.jumlah_keluar);
+                        $('#edit_harga_satuan').val(data.harga_satuan);
+                        $('#edit_total_harga').val(data.total_harga);
+                        $('#edit_tanggal_keluar').val(data.tanggal_keluar);
                         $('#edit_keterangan').val(data.keterangan);
-                        $('#modalEditBarangMasuk').modal('show');
+                        $('#modalEditBarangKeluar').modal('show');
                     }
                 });
             });
 
             // Menyimpan edit
             $('#simpanEdit').click(function () {
-                var data = $('#formEditBarangMasuk').serialize();
+                var data = $('#formEditBarangKeluar').serialize();
                 $.ajax({
-                    url: '../service/ajax/ajax-barang-masuk.php',
+                    url: '../service/ajax/ajax-barang-keluar.php',
                     type: 'PUT',
                     data: data,
                     success: function (response) {
-                        $('#modalEditBarangMasuk').modal('hide');
+                        $('#modalEditBarangKeluar').modal('hide');
                         table.ajax.reload();
-                        $('#formEditBarangMasuk')[0].reset();
+                        $('#formEditBarangKeluar')[0].reset();
                         alert(response);
                     }
                 });
@@ -342,13 +337,13 @@ if ($_SESSION["is_login"] == false) {
 
             // Delete barang masuk
             $('#tableBarangKeluar').on('click', '.delete', function () {
-                var barang_masuk_id = $(this).data('barang_masuk_id');
-                if (confirm('Kamu yakin ingin menghapus data tambah barang ini?')) {
+                var barang_keluar_id = $(this).data('barang_keluar_id');
+                if (confirm('Kamu yakin ingin menghapus data ini?')) {
                     $.ajax({
-                        url: '../service/ajax/ajax-barang-masuk.php',
+                        url: '../service/ajax/ajax-barang-keluar.php',
                         type: 'DELETE',
                         data: {
-                            barang_masuk_id: barang_masuk_id
+                            barang_keluar_id: barang_keluar_id
                         },
                         success: function (response) {
                             table.ajax.reload();
