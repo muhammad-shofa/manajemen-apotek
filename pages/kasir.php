@@ -77,7 +77,7 @@ if ($_SESSION["is_login"] == false) {
                                             <h5 class="text-dark namaBarang"><?= $data['nama'] ?></h5>
                                             <p class="text-dark hargaSatuan"><?= $data['harga_satuan'] ?></p>
                                             <button
-                                                onclick="tambahKeKeranjang('<?= $data['barang_id'] ?>', '<?= $data['nama'] ?>', <?= $data['harga_satuan'] ?>)"
+                                                onclick="tambahKeKeranjang('<?= $data['barang_id'] ?>', '<?= $data['nama'] ?>', <?= $data['harga_satuan'] ?>, <?= $data['harga_butir'] ?>)"
                                                 class="rounded rounded-5 btn btn-primary w-50 m-auto">
                                                 <i class="fas fa-tada"></i><i class="fas fa-plus"></i>
                                             </button>
@@ -99,6 +99,8 @@ if ($_SESSION["is_login"] == false) {
                                 <p>Kuantitas</p>
                                 <p>|</p>
                                 <p>Harga Satuan</p>
+                                <p>|</p>
+                                <p>Harga Butir</p>
                                 <p>|</p>
                                 <p>Total Harga</p>
                             </div>
@@ -167,7 +169,15 @@ if ($_SESSION["is_login"] == false) {
     <!-- Page level custom scripts -->
     <!-- <script src="../js/demo/datatables-demo.js"></script> -->
 
-    <script src="../js/kasir-2.js"></script>
+    <script src="../js/kasir-8.js"></script>
+    <!-- 8 tadi bisa -->
+    <!-- <script src="../js/kasir-7.js"></script> -->
+    <!-- <script src="../js/kasir-6.js"></script> -->
+    <!-- 6 bisa -->
+    <!-- <script src="../js/kasir-5.js"></script> -->
+    <!-- <script src="../js/kasir-4.js"></script> -->
+    <!-- <script src="../js/kasir-3.js"></script> -->
+    <!-- <script src="../js/kasir-2.js"></script> -->
     <!-- <script src="../js/kasir.js"></script> -->
     <script>
         $(document).ready(function () {
@@ -190,9 +200,9 @@ if ($_SESSION["is_login"] == false) {
                                      <div class="card m-2 p-2">
                                             <h5 class="text-dark">${item.nama}</h5>
                                             <p class="text-dark">Rp ${item.harga_satuan}</p>
-                                         <button onclick="tambahKeKeranjang('${item.barang_id}', '${item.nama}', ${item.harga_satuan})" 
+                                         <button onclick="tambahKeKeranjang('${item.barang_id}', '${item.nama}', ${item.harga_satuan}, ${item.harga_butir})" 
                                             class="rounded rounded-5 btn btn-primary w-50 m-auto">
-                                            <i class="fas fa-tada"></i> <i class="fas fa-plus"></i>
+                                            <i class="fas fa-tada"></i><i class="fas fa-plus"></i>
                                         </button>
                                     </div>
                                 `;
@@ -206,46 +216,93 @@ if ($_SESSION["is_login"] == false) {
                 }
             });
 
-            // selesaikan transaksi
+            // 
+            // Selesaikan transaksi
             $('#btnSelesai').on('click', function (e) {
                 e.preventDefault(); // Mencegah form submit default
 
-                // Ambil semua data-id dan data-jumlah-keluar dari setiap item dalam keranjangContainer
                 // Array untuk menampung barangId dan jumlahKeluar
                 let barangIds = [];
                 let jumlahKeluar = [];
+
                 // Ambil data barangId dan jumlahKeluar dari setiap item dalam keranjangContainer
                 $('#keranjangContainer .card').each(function () {
                     let barangId = $(this).attr('data-id'); // Ambil data-id
-                    let jumlah = $(this).attr('data-jumlah-keluar'); // Ambil data-jumlah-keluar
+                    let jumlah = $(this).find('.jumlahKeluar').val(); // Ambil nilai jumlahKeluar dari input .jumlahKeluar
                     barangIds.push(barangId);
                     jumlahKeluar.push(jumlah); // Simpan jumlahKeluar sesuai urutan barangId
                 });
 
-                // Ambil total harga
-                let totalHarga = $('#totalHargaSemuaBarang').text().replace('Rp ', '').replace('.', '');
+                // Ambil total harga dari tampilan dan bersihkan formatnya (hapus 'Rp' dan titik)
+                let totalHarga = $('#totalHargaSemuaBarang').text().replace('Rp ', '').replace('.', '').replace(',', '');
 
+                // Kirim data ke server menggunakan AJAX
                 $.ajax({
-                    url: '../service/ajax/ajax-kasir.php',
+                    url: '../service/ajax/ajax-kasir.php', // Ganti dengan URL yang sesuai
                     type: 'POST',
                     data: {
-                        barangIds: barangIds,
-                        jumlahKeluar: jumlahKeluar,
-                        totalHarga: totalHarga
+                        barangIds: barangIds,         // Array ID barang
+                        jumlahKeluar: jumlahKeluar,   // Array jumlah barang keluar
+                        totalHarga: totalHarga        // Total harga yang dihitung
                     },
                     success: function (response) {
-                        alert(response); // Menampilkan respons dari server
+                        // alert(response); // Menampilkan respons dari server
+
+                        // Jika transaksi berhasil, hapus data keranjang di localStorage
+                        localStorage.removeItem('keranjang'); // Menghapus data barang dari localStorage
 
                         // Reset keranjang setelah berhasil mengirim data
                         $('#keranjangContainer').empty(); // Menghapus semua barang di keranjang
                         $('#totalHargaSemuaBarang').text('Rp 0'); // Reset total harga
 
+                        // Anda bisa menambahkan logika tambahan di sini setelah transaksi selesai
                     },
                     error: function (jqXHR, textStatus, errorThrown) {
-                        alert("Gagal mengirim data: " + textStatus);
+                        alert("Gagal mengirim data: " + textStatus); // Menampilkan pesan error jika gagal
                     }
                 });
             });
+
+            // selesaikan transaksi
+            // $('#btnSelesai').on('click', function (e) {
+            //     e.preventDefault(); // Mencegah form submit default
+
+            //     // Ambil semua data-id dan data-jumlah-keluar dari setiap item dalam keranjangContainer
+            //     // Array untuk menampung barangId dan jumlahKeluar
+            //     let barangIds = [];
+            //     let jumlahKeluar = [];
+            //     // Ambil data barangId dan jumlahKeluar dari setiap item dalam keranjangContainer
+            //     $('#keranjangContainer .card').each(function () {
+            //         let barangId = $(this).attr('data-id'); // Ambil data-id
+            //         let jumlah = $(this).attr('data-jumlah-keluar'); // Ambil data-jumlah-keluar
+            //         barangIds.push(barangId);
+            //         jumlahKeluar.push(jumlah); // Simpan jumlahKeluar sesuai urutan barangId
+            //     });
+
+            //     // Ambil total harga
+            //     let totalHarga = $('#totalHargaSemuaBarang').text().replace('Rp ', '').replace('.', '');
+
+            //     $.ajax({
+            //         url: '../service/ajax/ajax-kasir.php',
+            //         type: 'POST',
+            //         data: {
+            //             barangIds: barangIds,
+            //             jumlahKeluar: jumlahKeluar,
+            //             totalHarga: totalHarga
+            //         },
+            //         success: function (response) {
+            //             alert(response); // Menampilkan respons dari server
+
+            //             // Reset keranjang setelah berhasil mengirim data
+            //             $('#keranjangContainer').empty(); // Menghapus semua barang di keranjang
+            //             $('#totalHargaSemuaBarang').text('Rp 0'); // Reset total harga
+
+            //         },
+            //         error: function (jqXHR, textStatus, errorThrown) {
+            //             alert("Gagal mengirim data: " + textStatus);
+            //         }
+            //     });
+            // });
 
         });
 

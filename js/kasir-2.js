@@ -33,7 +33,7 @@ function tambahKeKeranjang(barangId, namaBarang, hargaSatuan) {
               <button class="btn btn-sm btn-outline-secondary me-2" onclick="kurangiJumlah('${barangId}', ${hargaSatuan})">
                   <i class="fas fa-minus"></i>
               </button>
-              <p class="jumlahKeluar m-0 mx-2">1</p>
+              <p class="jumlahKeluar m-0 mx-2"></p>
               <button class="btn btn-sm btn-outline-secondary ms-2" onclick="tambahKeKeranjang('${barangId}', '${namaBarang}', ${hargaSatuan})">
                   <i class="fas fa-plus"></i>
               </button>
@@ -41,6 +41,8 @@ function tambahKeKeranjang(barangId, namaBarang, hargaSatuan) {
           <p>Rp ${hargaSatuan}</p>
           <p class="totalHarga">Rp ${hargaSatuan}</p>
       </div>`;
+    // <p class="jumlahKeluar m-0 mx-2"></p> // JUMLAH KELUAR OLD
+    // <input class="jumlahKeluar" name="jumlahKeluar" />
 
     keranjangContainer.appendChild(keranjangItem);
   }
