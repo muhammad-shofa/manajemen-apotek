@@ -125,6 +125,7 @@ if ($_SESSION["is_login"] == false) {
                                             <option value="Obat">Obat</option>
                                             <option value="Makanan">Makanan</option>
                                             <option value="Minuman">Minuman</option>
+                                            <option value="Lainnya">Lainnya</option>
                                         </select>
                                     </div>
                                     <div class="form-group">
@@ -188,6 +189,7 @@ if ($_SESSION["is_login"] == false) {
                                             <option value="Obat">Obat</option>
                                             <option value="Makanan">Makanan</option>
                                             <option value="Minuman">Minuman</option>
+                                            <option value="Lainnya">Lainnya</option>
                                         </select>
                                     </div>
                                     <div class="form-group">

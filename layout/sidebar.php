@@ -47,11 +47,11 @@
     </li>
 
     <!-- Nav Item -->
-    <li class="nav-item">
+    <!-- <li class="nav-item">
         <a class="nav-link" href="history.php">
             <i class="fa fa-history"></i>
             <span>History</span></a>
-    </li>
+    </li> -->
 
     <!-- Divider -->
     <hr class="sidebar-divider d-none d-md-block">

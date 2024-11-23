@@ -7,7 +7,7 @@ function tambahKeKeranjang(barangId, namaBarang, hargaSatuan, hargaButir) {
 
   // Cek apakah barang sudah ada di keranjang
   const existingItem = keranjang.find((item) => item.id === barangId);
-
+  
   if (existingItem) {
     // Jika barang sudah ada, perbarui jumlah dan total harga
     existingItem.jumlahKeluar += 1;
