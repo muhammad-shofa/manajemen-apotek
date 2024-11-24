@@ -175,7 +175,11 @@ if ($_SESSION["is_login"] == false) {
     <!-- Page level custom scripts -->
     <!-- <script src="../js/demo/datatables-demo.js"></script> -->
 
-    <!-- Coba experiment pakai ksir kasir-10 -->
+    <!-- <script src="../js/kasir-13.js"></script> -->
+    <!-- <script src="../js/kasir-12.js"></script> -->
+    <!-- 11 masih experiment -->
+    <!-- <script src="../js/kasir-11.js"></script> -->
+    <!-- kasir-10 BISA DAN NORMAL -->
     <script src="../js/kasir-10.js"></script>
     <!-- BISA kasir-9 -->
     <!-- <script src="../js/kasir-9.js"></script> -->
@@ -186,11 +190,6 @@ if ($_SESSION["is_login"] == false) {
     <!-- <script src="../js/kasir-7.js"></script> -->
     <!-- <script src="../js/kasir-6.js"></script> -->
     <!-- 6 bisa -->
-    <!-- <script src="../js/kasir-5.js"></script> -->
-    <!-- <script src="../js/kasir-4.js"></script> -->
-    <!-- <script src="../js/kasir-3.js"></script> -->
-    <!-- <script src="../js/kasir-2.js"></script> -->
-    <!-- <script src="../js/kasir.js"></script> -->
     <script>
         $(document).ready(function () {
             // cari nama barang
@@ -229,6 +228,74 @@ if ($_SESSION["is_login"] == false) {
             });
 
             // 
+            // Selesaikan transaksi
+            // $('#btnSelesai').on('click', function (e) {
+            //     e.preventDefault(); // Mencegah form submit default
+
+            //     // Array untuk menampung barangId, jumlahKeluar, dan hargaAktual
+            //     let barangIds = [];
+            //     let jumlahKeluar = [];
+            //     let hargaAktuals = [];
+
+            //     // Ambil data barangId, jumlahKeluar, dan hargaAktual dari setiap item dalam keranjangContainer
+            //     $('#keranjangContainer .card').each(function () {
+            //         let barangId = $(this).attr('data-id'); // Ambil data-id
+            //         let jumlah = $(this).find('.jumlahKeluar').val(); // Ambil nilai jumlahKeluar dari input
+            //         let hargaAktual = $(this).find('.hargaAktual').val();
+
+            //         // Validasi data sebelum ditambahkan ke array
+            //         if (barangId && jumlah && hargaAktual) {
+            //             barangIds.push(barangId);
+            //             jumlahKeluar.push(jumlah);
+            //             hargaAktuals.push(hargaAktual);
+            //         }
+            //     });
+
+            //     // Ambil total harga dari elemen HTML dan bersihkan formatnya
+            //     let totalHarga = $('#totalHargaSemuaBarang').text()
+            //         .replace('Rp ', '') // Hapus simbol 'Rp '
+            //         .replace(/\./g, '') // Hapus titik pemisah ribuan
+            //         .replace(/,/g, ''); // Hapus koma, jika ada
+
+            //     // Validasi data sebelum pengiriman
+            //     if (barangIds.length === 0 || jumlahKeluar.length === 0 || hargaAktuals.length === 0) {
+            //         alert("Keranjang kosong atau data tidak valid. Mohon periksa kembali.");
+            //         return;
+            //     }
+
+            //     // Kirim data ke server menggunakan AJAX
+            //     $.ajax({
+            //         url: '../service/ajax/ajax-kasir-2.php', // Ganti dengan URL yang sesuai
+            //         type: 'POST',
+            //         data: {
+            //             barangIds: barangIds,         // Array ID barang
+            //             jumlahKeluar: jumlahKeluar,   // Array jumlah barang keluar
+            //             hargaAktuals: hargaAktuals,   // Array harga aktual
+            //             totalHarga: totalHarga        // Total harga yang dihitung
+            //         },
+            //         success: function (response) {
+            //             // Berikan feedback kepada pengguna
+            //             alert(response); // Menampilkan respons dari server
+
+            //             // Jika transaksi berhasil, hapus data keranjang di localStorage
+            //             localStorage.removeItem('keranjang'); // Menghapus data barang dari localStorage
+
+            //             // Reset keranjang setelah berhasil mengirim data
+            //             $('#keranjangContainer').empty(); // Menghapus semua barang di keranjang
+            //             $('#totalHargaSemuaBarang').text('Rp 0'); // Reset total harga
+
+            //             // Logika tambahan jika perlu, seperti redirect atau refresh
+            //             console.log("Transaksi selesai dan keranjang direset.");
+            //         },
+            //         error: function (jqXHR, textStatus, errorThrown) {
+            //             // Menampilkan pesan error jika gagal
+            //             alert("Gagal mengirim data: " + textStatus + " - " + errorThrown);
+            //         }
+            //     });
+            // });
+
+
+            // DARI GITHUB
             // Selesaikan transaksi
             $('#btnSelesai').on('click', function (e) {
                 e.preventDefault(); // Mencegah form submit default
@@ -274,6 +341,57 @@ if ($_SESSION["is_login"] == false) {
                     }
                 });
             });
+
+            // DARI GITHUB
+
+
+
+            // // Selesaikan transaksi
+            // $('#btnSelesai').on('click', function (e) {
+            //     e.preventDefault(); // Mencegah form submit default
+
+            //     // Array untuk menampung barangId dan jumlahKeluar
+            //     let barangIds = [];
+            //     let jumlahKeluar = [];
+
+            //     // Ambil data barangId dan jumlahKeluar dari setiap item dalam keranjangContainer
+            //     $('#keranjangContainer .card').each(function () {
+            //         let barangId = $(this).attr('data-id'); // Ambil data-id
+            //         let jumlah = $(this).find('.jumlahKeluar').val(); // Ambil nilai jumlahKeluar dari input .jumlahKeluar
+
+            //         barangIds.push(barangId);
+            //         jumlahKeluar.push(jumlah); // Simpan jumlahKeluar sesuai urutan barangId
+            //     });
+
+            //     // Ambil total harga dari tampilan dan bersihkan formatnya (hapus 'Rp' dan titik)
+            //     // let totalHarga = $('#totalHargaSemuaBarang').text().replace('Rp ', '').replace('.', '').replace(',', '');
+
+            //     // Kirim data ke server menggunakan AJAX
+            //     $.ajax({
+            //         url: '../service/ajax/ajax-kasir-2.php', // Ganti dengan URL yang sesuai
+            //         type: 'POST',
+            //         data: {
+            //             barangIds: barangIds,         // Array ID barang
+            //             jumlahKeluar: jumlahKeluar,   // Array jumlah barang keluar
+            //             totalHarga: totalHarga        // Total harga yang dihitung
+            //         },
+            //         success: function (response) {
+            //             // alert(response); // Menampilkan respons dari server
+
+            //             // Jika transaksi berhasil, hapus data keranjang di localStorage
+            //             localStorage.removeItem('keranjang'); // Menghapus data barang dari localStorage
+
+            //             // Reset keranjang setelah berhasil mengirim data
+            //             $('#keranjangContainer').empty(); // Menghapus semua barang di keranjang
+            //             $('#totalHargaSemuaBarang').text('Rp 0'); // Reset total harga
+
+            //             // Anda bisa menambahkan logika tambahan di sini setelah transaksi selesai
+            //         },
+            //         error: function (jqXHR, textStatus, errorThrown) {
+            //             alert("Gagal mengirim data: " + textStatus); // Menampilkan pesan error jika gagal
+            //         }
+            //     });
+            // });
 
             // selesaikan transaksi
             // $('#btnSelesai').on('click', function (e) {

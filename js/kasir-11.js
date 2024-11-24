@@ -62,11 +62,13 @@ function tambahKeKeranjang(barangId, namaBarang, hargaSatuan, hargaButir) {
             </div>
             ${
               hargaSatuan > 0
-                ? `<p class="hargaSatuan">Rp ${hargaSatuan}</p>`
+                ? `<p class="hargaSatuan" ondblclick="editHarga('${barangId}', 'hargaSatuan', ${hargaSatuan})">Rp ${hargaSatuan}</p>`
                 : ""
             }
             ${
-              hargaButir > 0 ? `<p class="hargaButir">Rp ${hargaButir}</p>` : ""
+              hargaButir > 0
+                ? `<p class="hargaButir" ondblclick="editHarga('${barangId}', 'hargaButir', ${hargaButir})">Rp ${hargaButir}</p>`
+                : ""
             }
             <p class="totalHarga">Rp ${hargaAktual}</p>
             <button class="btn btn-sm btn-outline-danger ms-2" onclick="hapusBarangDariKeranjang('${barangId}')">
@@ -81,10 +83,75 @@ function tambahKeKeranjang(barangId, namaBarang, hargaSatuan, hargaButir) {
   updateTotalHarga();
 }
 
-// Fungsi untuk mengurangi jumlah barang di keranjang
-function kurangiJumlah(barangId, hargaSatuan, hargaButir) {
-  const hargaAktual = hargaSatuan > 0 ? hargaSatuan : hargaButir;
+// Fungsi untuk mengedit harga saat diklik 2 kali (ondblclick)
+function editHarga(barangId, jenisHarga, hargaLama) {
+  const hargaElement = document.querySelector(
+    `#item-${barangId} .${jenisHarga}`
+  );
+  const input = document.createElement("input");
+  input.type = "number";
+  input.value = hargaLama;
+  input.min = 0;
+  input.classList.add("form-control");
+  hargaElement.innerHTML = ""; // Kosongkan elemen harga
+  hargaElement.appendChild(input);
+  input.focus();
 
+  // Ketika enter ditekan, update harga dan hitung ulang total harga
+  input.addEventListener("keydown", function (event) {
+    if (event.key === "Enter") {
+      const newHarga = parseFloat(input.value);
+      if (!isNaN(newHarga) && newHarga > 0) {
+        // Update harga sesuai dengan jenis (hargaSatuan atau hargaButir)
+        updateHargaBarang(barangId, jenisHarga, newHarga);
+        input.remove(); // Hapus input setelah selesai
+      } else {
+        alert("Harga tidak valid!");
+        input.remove();
+      }
+    }
+  });
+}
+
+// Fungsi untuk memperbarui harga barang dan total harga
+function updateHargaBarang(barangId, jenisHarga, hargaBaru) {
+  // Ambil data keranjang dari localStorage
+  let keranjang = JSON.parse(localStorage.getItem("keranjang")) || [];
+
+  // Temukan barang yang akan diupdate
+  const existingItem = keranjang.find((item) => item.id === barangId);
+
+  if (existingItem) {
+    // Update harga sesuai jenis harga (hargaSatuan atau hargaButir)
+    if (jenisHarga === "hargaSatuan") {
+      existingItem.hargaSatuan = hargaBaru;
+    } else if (jenisHarga === "hargaButir") {
+      existingItem.hargaButir = hargaBaru;
+    }
+
+    // Tentukan harga aktual yang digunakan
+    existingItem.hargaAktual =
+      existingItem.hargaSatuan > 0
+        ? existingItem.hargaSatuan
+        : existingItem.hargaButir;
+
+    // Simpan kembali ke localStorage
+    localStorage.setItem("keranjang", JSON.stringify(keranjang));
+
+    // Update tampilan harga dan total harga di UI
+    const totalHargaElement = document.querySelector(
+      `#item-${barangId} .totalHarga`
+    );
+    totalHargaElement.innerText =
+      "Rp " + existingItem.hargaAktual * existingItem.jumlahKeluar;
+  }
+
+  // Update total harga semua barang di keranjang
+  updateTotalHarga();
+}
+
+// Fungsi untuk mengurangi jumlah barang di keranjang
+function kurangiJumlah(barangId, hargaAktual) {
   // Ambil data keranjang dari localStorage
   let keranjang = JSON.parse(localStorage.getItem("keranjang")) || [];
 
@@ -94,14 +161,6 @@ function kurangiJumlah(barangId, hargaSatuan, hargaButir) {
   if (existingItem && existingItem.jumlahKeluar > 1) {
     // Kurangi jumlah barang
     existingItem.jumlahKeluar -= 1;
-
-    // Tentukan harga yang digunakan
-    existingItem.hargaAktual =
-      existingItem.hargaSatuan > 0
-        ? existingItem.hargaSatuan
-        : existingItem.hargaButir;
-
-    // Simpan kembali ke localStorage
     localStorage.setItem("keranjang", JSON.stringify(keranjang));
 
     // Update tampilan jumlah dan total harga
@@ -124,57 +183,6 @@ function kurangiJumlah(barangId, hargaSatuan, hargaButir) {
   updateTotalHarga();
 }
 
-// Modifikasi fungsi lainnya juga dengan logika `hargaSatuan > 0 ? hargaSatuan : hargaButir`.
-
-// Fungsi untuk mengupdate jumlah barang berdasarkan input
-function updateJumlah(barangId, hargaSatuan, hargaButir, jumlahBaru) {
-  const hargaAktual = hargaSatuan > 0 ? hargaSatuan : hargaButir;
-
-  // Ambil data keranjang dari localStorage
-  let keranjang = JSON.parse(localStorage.getItem("keranjang")) || [];
-
-  const existingItem = keranjang.find((item) => item.id === barangId);
-
-  if (existingItem) {
-    // Validasi input jumlah
-    let jumlah = parseInt(jumlahBaru);
-
-    if (isNaN(jumlah) || jumlah <= 0) {
-      jumlah = 1; // Default ke 1 jika input tidak valid
-    }
-
-    existingItem.jumlahKeluar = jumlah;
-
-    // Tentukan harga yang digunakan
-    existingItem.hargaAktual =
-      existingItem.hargaSatuan > 0
-        ? existingItem.hargaSatuan
-        : existingItem.hargaButir;
-
-    // Simpan kembali ke localStorage
-    localStorage.setItem("keranjang", JSON.stringify(keranjang));
-
-    // Update tampilan jumlah dan total harga
-    const totalHargaElement = document.querySelector(
-      `#item-${barangId} .totalHarga`
-    );
-    totalHargaElement.innerText =
-      "Rp " + existingItem.jumlahKeluar * existingItem.hargaAktual;
-  }
-
-  // Update total harga semua barang di keranjang
-  updateTotalHarga();
-}
-
-// Fungsi untuk menangani blur input jumlah
-function handleBlur(barangId, hargaSatuan, inputElement) {
-  if (inputElement.value === "" || parseInt(inputElement.value) <= 0) {
-    // Jika input kosong atau tidak valid, set ke 1
-    inputElement.value = 1;
-    updateJumlah(barangId, hargaSatuan, inputElement.value);
-  }
-}
-
 // Fungsi untuk menghitung dan menampilkan total harga keranjang
 function updateTotalHarga() {
   // Ambil data keranjang dari localStorage
@@ -182,10 +190,7 @@ function updateTotalHarga() {
   const totalHargaElement = document.getElementById("totalHargaSemuaBarang");
 
   let totalHarga = keranjang.reduce(
-    (total, item) =>
-      total +
-      (item.hargaSatuan > 0 ? item.hargaSatuan : item.hargaButir) *
-        item.jumlahKeluar,
+    (total, item) => total + item.hargaAktual * item.jumlahKeluar,
     0
   );
 
@@ -212,67 +217,3 @@ function hapusBarangDariKeranjang(barangId) {
   // Update total harga semua barang di keranjang
   updateTotalHarga();
 }
-
-// Fungsi untuk menampilkan keranjang yang ada di localStorage
-function tampilkanKeranjang() {
-  const keranjangContainer = document.getElementById("keranjangContainer");
-
-  // Ambil data keranjang dari localStorage
-  const keranjang = JSON.parse(localStorage.getItem("keranjang")) || [];
-
-  // Kosongkan keranjang container sebelum menambah data
-  keranjangContainer.innerHTML = "";
-
-  // Jika keranjang tidak kosong, tampilkan setiap barang
-  keranjang.forEach((item) => {
-    const keranjangItem = document.createElement("div");
-    keranjangItem.classList.add("card", "w-100", "d-flex", "p-2", "m-1");
-    keranjangItem.id = `item-${item.id}`;
-    keranjangItem.setAttribute("data-id", item.id);
-
-    keranjangItem.innerHTML = `
-          <div class="d-flex justify-content-between align-items-center">
-            <h5 class="text-dark">${item.namaBarang}</h5>
-            <div class="d-flex align-items-center">
-              <button class="btn btn-sm btn-outline-secondary me-2" onclick="kurangiJumlah('${
-                item.id
-              }', ${item.hargaSatuan})">
-                <i class="fas fa-minus"></i>
-              </button>
-              <input type="number" style="max-width: 80px;" class="jumlahKeluar form-control mx-2" value="${
-                item.jumlahKeluar
-              }" min="1"
-                     oninput="updateJumlah('${item.id}', ${
-      item.hargaSatuan
-    }, this.value)" 
-                     onblur="handleBlur('${item.id}', ${
-      item.hargaSatuan
-    }, this)">
-              <button class="btn btn-sm btn-outline-secondary ms-2" onclick="tambahKeKeranjang('${
-                item.id
-              }', '${item.namaBarang}', ${item.hargaSatuan}, ${
-      item.hargaButir
-    })">
-                <i class="fas fa-plus"></i>
-              </button>
-            </div>
-            ${item.hargaAktual > 0 ? `<p>Rp ${item.hargaAktual}</p>` : ""}
-            <p class="totalHarga">Rp ${item.hargaSatuan * item.jumlahKeluar}</p>
-            <button class="btn btn-sm btn-outline-danger ms-2" onclick="hapusBarangDariKeranjang('${
-              item.id
-            }')">
-              <i class="fas fa-trash"></i>
-            </button>
-          </div>`;
-    // <p>Rp ${item.hargaSatuan}</p>
-    // <p>Rp ${item.hargaButir}</p>
-
-    keranjangContainer.appendChild(keranjangItem);
-  });
-
-  // Update total harga setelah menampilkan barang
-  updateTotalHarga();
-}
-
-// Panggil tampilkanKeranjang ketika halaman dimuat untuk menampilkan data keranjang yang sudah ada
-document.addEventListener("DOMContentLoaded", tampilkanKeranjang);
