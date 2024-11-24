@@ -68,16 +68,16 @@ if ($_SESSION["is_login"] == false) {
                         <div class="card-header py-3">
                             <h6 class="m-0 font-weight-bold text-primary mb-3">Barang Keluar</h6>
                             <hr>
-                            <div class="d-flex flex-wrap justify-content-between">
-                                <!-- btn trigger modal tambah barang masuk -->
-                                <!-- <button type="button" class="btn btn-primary my-2" data-toggle="modal"
+                            <!-- <div class="d-flex flex-wrap justify-content-between">
+                                btn trigger modal tambah barang masuk
+                                <button type="button" class="btn btn-primary my-2" data-toggle="modal"
                                     data-target="#modalTambahBarang">
                                     Tambah Barang
-                                </button> -->
+                                </button>
                                 <a href="#0" class="btn btn-sm my-2 py-2 btn-info">
                                     <i class="fas fa-download fa-sm text-white-50"></i> Unduh Excel
                                 </a>
-                            </div>
+                            </div> -->
                         </div>
 
                         <div class="card-body">
@@ -90,7 +90,7 @@ if ($_SESSION["is_login"] == false) {
                                             <th>Nama</th>
                                             <th>Kategori</th>
                                             <th>Jumlah Keluar</th>
-                                            <th>Harga Satuan</th>
+                                            <th>Harga</th>
                                             <th>Total Harga</th>
                                             <th>Tanggal Keluar</th>
                                             <th>Keterangan</th>
@@ -136,7 +136,7 @@ if ($_SESSION["is_login"] == false) {
                                                     name="jumlah_keluar_old">
                                             </div>
                                             <div class="form-group">
-                                                <label for="edit_harga_satuan">Harga Satuan :</label>
+                                                <label for="edit_harga_satuan">Harga :</label>
                                                 <input type="number" class="form-control" id="edit_harga_satuan"
                                                     name="harga_satuan">
                                             </div>

@@ -11,9 +11,13 @@ if ($_SESSION["is_login"] == false) {
     header("location: ../index.php");
 }
 
-// jumlah total_stok
-$results_total_stok = $connected->query("SELECT SUM(stok) AS total_stok FROM barang");
-$d_total_stok = mysqli_fetch_assoc($results_total_stok);
+// jumlah semua tipe barang
+$jumlah_tipe_barang = $connected->query("SELECT COUNT(*) AS total_barang FROM barang");
+$d_jumlah_tipe_barang = mysqli_fetch_assoc($jumlah_tipe_barang);
+
+// jumlah total_stok || saat ini tidak digunakan
+// $results_total_stok = $connected->query("SELECT SUM(stok) AS total_stok FROM barang");
+// $d_total_stok = mysqli_fetch_assoc($results_total_stok);
 
 // jumlah masuk
 $results_total_jumlah_masuk = $connected->query("SELECT SUM(jumlah_masuk) AS jumlah_masuk FROM barang_masuk");
@@ -24,6 +28,7 @@ $results_total_jumlah_keluar = $connected->query("SELECT SUM(jumlah_keluar) AS j
 $d_total_jumlah_keluar = mysqli_fetch_assoc($results_total_jumlah_keluar);
 
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -66,19 +71,23 @@ $d_total_jumlah_keluar = mysqli_fetch_assoc($results_total_jumlah_keluar);
                 <?php include "../layout/navbar.php" ?>
 
                 <!-- Begin Page Content -->
-                <div class="container-fluid" id="mainDashboard">
+                <div class="container-fluid text-dark" id="mainDashboard">
 
                     <!-- Page Heading -->
                     <div class="d-sm-flex align-items-center justify-content-between mb-4">
                         <h1 class="h3 mb-0 text-gray-800">Dashboard</h1>
-                        <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i
-                                class="fas fa-download fa-sm text-white-50"></i> Generate Report</a>
+                        <!-- <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i
+                                class="fas fa-download fa-sm text-white-50"></i> Generate Report</a> -->
                     </div>
-
+                    <hr>
+                    <h1 style="font-size: 50px;">Selamat datang,
+                        <b class="text-success">
+                            <?= $_SESSION['username'] ?>!
+                        </b>
+                    </h1>
                     <!-- Content Row -->
-                    <div class="row">
-
-                        <!-- Earnings (Monthly) Card Example -->
+                    <div class="row mt-3">
+                        <!-- Total semua barang -->
                         <div class="col-xl-3 col-md-6 mb-4">
                             <a href="barang.php">
                                 <div class="card border-left-primary shadow h-100 py-2">
@@ -86,9 +95,9 @@ $d_total_jumlah_keluar = mysqli_fetch_assoc($results_total_jumlah_keluar);
                                         <div class="row no-gutters align-items-center">
                                             <div class="col mr-2">
                                                 <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                                                    Semua Stok Barang</div>
+                                                    Total Semua Barang</div>
                                                 <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                                    <?= $d_total_stok['total_stok'] ?>
+                                                    <?= $d_jumlah_tipe_barang['total_barang'] ?>
                                                 </div>
                                             </div>
                                             <div class="col-auto">
@@ -110,7 +119,7 @@ $d_total_jumlah_keluar = mysqli_fetch_assoc($results_total_jumlah_keluar);
                                                 <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
                                                     Semua Barang Masuk</div>
                                                 <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                                    <?= $d_total_jumlah_masuk['jumlah_masuk'] ?>
+                                                    <?= $d_total_jumlah_masuk['jumlah_masuk'] ? $d_total_jumlah_masuk['jumlah_masuk'] : 0 ?>
                                                 </div>
                                             </div>
                                             <div class="col-auto">
@@ -132,7 +141,7 @@ $d_total_jumlah_keluar = mysqli_fetch_assoc($results_total_jumlah_keluar);
                                                 <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
                                                     Semua Barang Keluar</div>
                                                 <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                                    <?= $d_total_jumlah_keluar['jumlah_keluar'] ?>
+                                                    <?= $d_total_jumlah_keluar['jumlah_keluar'] ? $d_total_jumlah_keluar['jumlah_keluar'] : 0 ?>
                                                 </div>
                                             </div>
                                             <div class="col-auto">

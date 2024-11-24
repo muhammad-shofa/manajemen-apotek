@@ -29,7 +29,7 @@
     <li class="nav-item">
         <a class="nav-link" href="barang.php">
             <i class="fas fa-fw fa-box"></i>
-            <span>Barang</span></a>
+            <span>Tipe & Stok Barang</span></a>
     </li>
 
     <!-- Nav Item -->

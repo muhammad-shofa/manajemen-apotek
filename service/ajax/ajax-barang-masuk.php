@@ -72,7 +72,8 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
 
 } else if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // tambah barang
-    $barang_id = htmlspecialchars($_POST["pilih_barang"]); // value id
+    // $barang_id = htmlspecialchars($_POST["pilih_barang"]); // value id
+    $barang_id = intval($_POST["barang_id"]); // Pastikan ini integer
     $nomor_bacth = htmlspecialchars($_POST["nomor_bacth"]);
     $tanggal_masuk = htmlspecialchars($_POST["tanggal_masuk"]);
     $jumlah_masuk = htmlspecialchars($_POST["jumlah_masuk"]);

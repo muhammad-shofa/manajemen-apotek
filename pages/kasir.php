@@ -75,7 +75,15 @@ if ($_SESSION["is_login"] == false) {
                                         ?>
                                         <div class="card m-2 p-2">
                                             <h5 class="text-dark namaBarang"><?= $data['nama'] ?></h5>
-                                            <p class="text-dark hargaSatuan"><?= $data['harga_satuan'] ?></p>
+                                            <p class="text-dark hargaSatuan">
+                                                <?php
+                                                if ($data['harga_satuan']) {
+                                                    echo $data['harga_satuan'];
+                                                } else {
+                                                    echo $data['harga_butir'];
+                                                }
+                                                ?>
+                                            </p>
                                             <button
                                                 onclick="tambahKeKeranjang('<?= $data['barang_id'] ?>', '<?= $data['nama'] ?>', <?= $data['harga_satuan'] ?>, <?= $data['harga_butir'] ?>)"
                                                 class="rounded rounded-5 btn btn-primary w-50 m-auto">
@@ -98,9 +106,7 @@ if ($_SESSION["is_login"] == false) {
                                 <p>|</p>
                                 <p>Kuantitas</p>
                                 <p>|</p>
-                                <p>Harga Satuan</p>
-                                <p>|</p>
-                                <p>Harga Butir</p>
+                                <p>Harga</p>
                                 <p>|</p>
                                 <p>Total Harga</p>
                             </div>
@@ -169,8 +175,14 @@ if ($_SESSION["is_login"] == false) {
     <!-- Page level custom scripts -->
     <!-- <script src="../js/demo/datatables-demo.js"></script> -->
 
-    <script src="../js/kasir-8.js"></script>
-    <!-- 8 tadi bisa -->
+    <!-- Coba experiment pakai ksir kasir-10 -->
+    <script src="../js/kasir-10.js"></script>
+    <!-- BISA kasir-9 -->
+    <!-- <script src="../js/kasir-9.js"></script> -->
+    <!-- 8 bisa -->
+    <!-- <script src="../js/kasir-8.js"></script> -->
+
+
     <!-- <script src="../js/kasir-7.js"></script> -->
     <!-- <script src="../js/kasir-6.js"></script> -->
     <!-- 6 bisa -->
@@ -199,7 +211,7 @@ if ($_SESSION["is_login"] == false) {
                                     html += `
                                      <div class="card m-2 p-2">
                                             <h5 class="text-dark">${item.nama}</h5>
-                                            <p class="text-dark">Rp ${item.harga_satuan}</p>
+                                            <p class="text-dark">Rp ${item.harga_satuan || item.harga_butir}</p>
                                          <button onclick="tambahKeKeranjang('${item.barang_id}', '${item.nama}', ${item.harga_satuan}, ${item.harga_butir})" 
                                             class="rounded rounded-5 btn btn-primary w-50 m-auto">
                                             <i class="fas fa-tada"></i><i class="fas fa-plus"></i>
@@ -238,7 +250,7 @@ if ($_SESSION["is_login"] == false) {
 
                 // Kirim data ke server menggunakan AJAX
                 $.ajax({
-                    url: '../service/ajax/ajax-kasir.php', // Ganti dengan URL yang sesuai
+                    url: '../service/ajax/ajax-kasir-2.php', // Ganti dengan URL yang sesuai
                     type: 'POST',
                     data: {
                         barangIds: barangIds,         // Array ID barang

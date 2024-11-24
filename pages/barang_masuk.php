@@ -74,9 +74,6 @@ if ($_SESSION["is_login"] == false) {
                                     data-target="#modalTambahBarang">
                                     Tambah Barang
                                 </button>
-                                <a href="#0" class="btn btn-sm my-2 py-2 btn-info">
-                                    <i class="fas fa-download fa-sm text-white-50"></i> Unduh Excel
-                                </a>
                             </div>
                         </div>
 
@@ -115,40 +112,23 @@ if ($_SESSION["is_login"] == false) {
                                     </div>
                                     <form id="formTambahBarang">
                                         <div class="modal-body">
-                                            <!-- <div class="form-group">
+                                            <div class="form-group">
                                                 <label for="pilih_barang">Pilih Barang :</label>
                                                 <input list="barang_list" class="form-control" id="pilih_barang"
                                                     name="pilih_barang" placeholder="Cari barang...">
                                                 <datalist id="barang_list">
-                                                    <php
-                                                    $results_all_barang = $connected->query("SELECT * FROM barang");
-                                                    if ($results_all_barang->num_rows > 0) {
-                                                        while ($data_semua_barang = $results_all_barang->fetch_assoc()) {
-                                                            ?>
-                                                            <input type="text" value="<= $data_semua_barang['barang_id'] ?>">
-                                                            <option value="<= $data_semua_barang['nama'] ?><= $data_semua_barang['barang_id'] ?>">
-                                                                <= $data_semua_barang['nama'] ?>
-                                                            </option>
-                                                        <php }
-                                                    } ?>
-                                                </datalist>
-                                            </div> -->
-
-                                            <div class="form-group">
-                                                <label for="pilih_barang">Pilih Barang :</label>
-                                                <select class="form-control select2" name="pilih_barang"
-                                                    id="pilih_barang" style="width: 100%;">
                                                     <?php
                                                     $results_all_barang = $connected->query("SELECT * FROM barang");
                                                     if ($results_all_barang->num_rows > 0) {
                                                         while ($data_semua_barang = $results_all_barang->fetch_assoc()) {
                                                             ?>
-                                                            <option value="<?= $data_semua_barang['barang_id'] ?>">
+                                                            <option value="<?= $data_semua_barang['nama'] ?>"
+                                                                data-id="<?= $data_semua_barang['barang_id'] ?>">
                                                                 <?= $data_semua_barang['nama'] ?>
                                                             </option>
                                                         <?php }
                                                     } ?>
-                                                </select>
+                                                </datalist>
                                             </div>
                                             <div class="form-group">
                                                 <label for="nomor_bacth">Nomor Bacth :</label>
@@ -376,7 +356,21 @@ if ($_SESSION["is_login"] == false) {
 
             // Tambah Barang
             $('#tambahkanBarang').click(function () {
-                var data = $('#formTambahBarang').serialize();
+                // Ambil value nama barang dari input
+                var namaBarang = $('#pilih_barang').val();
+
+                // Cari ID barang berdasarkan nama yang dipilih
+                var barangId = $('#barang_list option[value="' + namaBarang + '"]').data('id');
+
+                if (!barangId) {
+                    alert("Barang tidak ditemukan!");
+                    return;
+                }
+
+                // Tambahkan ID barang ke data form
+                var data = $('#formTambahBarang').serialize() + '&barang_id=' + barangId;
+
+                // var data = $('#formTambahBarang').serialize();
                 $.ajax({
                     url: '../service/ajax/ajax-barang-masuk.php',
                     type: 'POST',

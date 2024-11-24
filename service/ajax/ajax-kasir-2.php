@@ -13,7 +13,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         exit;
     }
 
-    $transaksi_berhasil;
+    $transaksi_berhasil = "";
 
     // Proses setiap barang_id dan jumlah_keluar
     foreach ($barangIds as $index => $barang_id) {
@@ -32,16 +32,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             // Data barang yang dibutuhkan
             $kategori = $data_barang['kategori'];
             $harga_satuan = $data_barang['harga_satuan'];
+            $harga_butir = $data_barang['harga_butir'];
             $stok = $data_barang['stok']; // Stok yang tersedia
             $tanggal_keluar = date('Y-m-d');
             $keterangan = "Penjualan";
 
-            // Hitung total harga berdasarkan jumlah dan harga satuan
-            $total_harga_item = $jumlah * $harga_satuan;
+            // Tentukan harga yang valid (tidak nol)
+            $harga = $harga_satuan > 0 ? $harga_satuan : $harga_butir;
+
+            // Hitung total harga berdasarkan jumlah dan harga yang valid
+            $total_harga_item = $jumlah * $harga;
 
             // Masukkan data ke tabel barang_keluar
             $insertStmt = $connected->prepare("INSERT INTO barang_keluar (barang_id, kategori, jumlah_keluar, harga_satuan, total_harga, tanggal_keluar, keterangan) VALUES (?, ?, ?, ?, ?, ?, ?)");
-            $insertStmt->bind_param("isidiss", $barang_id, $kategori, $jumlah, $harga_satuan, $total_harga_item, $tanggal_keluar, $keterangan);
+            $insertStmt->bind_param("isidiss", $barang_id, $kategori, $jumlah, $harga, $total_harga_item, $tanggal_keluar, $keterangan);
 
             if ($insertStmt->execute()) {
                 // Mengurangi stok barang
@@ -50,8 +54,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $updateStmt->bind_param("ii", $new_stok, $barang_id);
 
                 $updateStmt->execute();
-                $transaksi_berhasil = "Transaksi Berhasil, Data telah masuk ke barang keluar. ";
-
+                $transaksi_berhasil .= "Transaksi berhasil untuk barang ID $barang_id.<br>";
 
                 $updateStmt->close();
             } else {
