@@ -29,27 +29,59 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
 
         echo json_encode($data);
     } else {
-        $result = $connected->query($select->selectTable($table_name = "barang_keluar", $fields = "bk.*, b.nama ", $condition = "bk JOIN barang b ON bk.barang_id = b.barang_id"));
+        if (isset($_GET['tanggalFilter'])) {
+            $tanggalFilter = $_GET['tanggalFilter'];
+            // echo $tanggalFilter;
 
-        $data = [];
+            $result = $connected->query($select->selectTable($table_name = "barang_keluar", $fields = "bk.*, b.nama ", $condition = "bk JOIN barang b ON bk.barang_id = b.barang_id WHERE bk.tanggal_keluar = '$tanggalFilter'"));
 
-        $i = 0;
-        while ($row = $result->fetch_assoc()) {
-            $i++;
-            $row['no'] = $i;
+            $data = [];
+            $totalKeseluruhan = 0; // Variabel untuk menghitung total keseluruhan
 
-            $row['tanggal_keluar'] = date("d/m/Y", strtotime($row['tanggal_keluar']));
-            if (!empty($row['exp'])) {
-                $row['exp'] = date("d/m/Y", strtotime($row['exp']));
-            }
+            $i = 0;
+            while ($row = $result->fetch_assoc()) {
+                $i++;
+                $row['no'] = $i;
 
-            $row['action'] = '<button type="button" class="edit btn btn-primary btn-sm" data-barang_keluar_id="' . $row['barang_keluar_id'] . '" data-barang_id="' . $row['barang_id'] . '" data-toggle="modal"><i class="fas fa-pen"></i></button>
+                $row['tanggal_keluar'] = date("d/m/Y", strtotime($row['tanggal_keluar']));
+
+                // Tambahkan ke total keseluruhan
+                $totalKeseluruhan += $row['total_harga'];
+
+                if (!empty($row['exp'])) {
+                    $row['exp'] = date("d/m/Y", strtotime($row['exp']));
+                }
+
+                $row['action'] = '<button type="button" class="edit btn btn-primary btn-sm" data-barang_keluar_id="' . $row['barang_keluar_id'] . '" data-barang_id="' . $row['barang_id'] . '" data-toggle="modal"><i class="fas fa-pen"></i></button>
             <button type="button" class="delete btn btn-danger btn-sm" data-barang_keluar_id="' . $row['barang_keluar_id'] . '" data-toggle="modal"><i class="fas fa-trash"></i></button>';
 
-            $data[] = $row;
-        }
+                $data[] = $row;
+            }
 
-        echo json_encode(["data" => $data]);
+            echo json_encode(["data" => $data, "total_harga" => $totalKeseluruhan]);
+        } else {
+            $result = $connected->query($select->selectTable($table_name = "barang_keluar", $fields = "bk.*, b.nama ", $condition = "bk JOIN barang b ON bk.barang_id = b.barang_id"));
+
+            $data = [];
+
+            $i = 0;
+            while ($row = $result->fetch_assoc()) {
+                $i++;
+                $row['no'] = $i;
+
+                $row['tanggal_keluar'] = date("d/m/Y", strtotime($row['tanggal_keluar']));
+                if (!empty($row['exp'])) {
+                    $row['exp'] = date("d/m/Y", strtotime($row['exp']));
+                }
+
+                $row['action'] = '<button type="button" class="edit btn btn-primary btn-sm" data-barang_keluar_id="' . $row['barang_keluar_id'] . '" data-barang_id="' . $row['barang_id'] . '" data-toggle="modal"><i class="fas fa-pen"></i></button>
+            <button type="button" class="delete btn btn-danger btn-sm" data-barang_keluar_id="' . $row['barang_keluar_id'] . '" data-toggle="modal"><i class="fas fa-trash"></i></button>';
+
+                $data[] = $row;
+            }
+
+            echo json_encode(["data" => $data]);
+        }
     }
 
 } else if ($_SERVER["REQUEST_METHOD"] == "POST") {

@@ -177,19 +177,15 @@ if ($_SESSION["is_login"] == false) {
 
     <!-- <script src="../js/kasir-13.js"></script> -->
     <!-- <script src="../js/kasir-12.js"></script> -->
-    <!-- 11 masih experiment -->
-    <!-- <script src="../js/kasir-11.js"></script> -->
-    <!-- kasir-10 BISA DAN NORMAL -->
-    <script src="../js/kasir-10.js"></script>
+
+    <!-- 11 BISA DAN NORMAL, JUMLAH KELUAR DAPAT DIEDIT SESUAI KEINGINAN, NAMUN -->
+    <script src="../js/kasir-11.js"></script>
+    <!-- kasir-10 BISA DAN NORMAL NAMUN KUANTITASNYA KETIKA DIEDIT TIDAK SINKRON DENGAN TOTAL HARGA -->
+    <!-- <script src="../js/kasir-10.js"></script> -->
     <!-- BISA kasir-9 -->
     <!-- <script src="../js/kasir-9.js"></script> -->
-    <!-- 8 bisa -->
+    <!-- 8 bisa diedit jumlah keluarnya sesuai keinginan namun beberapa masih ada yang kurang -->
     <!-- <script src="../js/kasir-8.js"></script> -->
-
-
-    <!-- <script src="../js/kasir-7.js"></script> -->
-    <!-- <script src="../js/kasir-6.js"></script> -->
-    <!-- 6 bisa -->
     <script>
         $(document).ready(function () {
             // cari nama barang

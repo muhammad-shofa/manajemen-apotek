@@ -35,6 +35,12 @@ if ($_SESSION["is_login"] == false) {
     <!-- Custom styles for this template-->
     <link href="../css/sb-admin-2.min.css" rel="stylesheet">
 
+    <style>
+        .totalPenjualanSesuaiTanggal {
+            display: none;
+        }
+    </style>
+
 </head>
 
 <body id="page-top">
@@ -68,16 +74,12 @@ if ($_SESSION["is_login"] == false) {
                         <div class="card-header py-3">
                             <h6 class="m-0 font-weight-bold text-primary mb-3">Barang Keluar</h6>
                             <hr>
-                            <!-- <div class="d-flex flex-wrap justify-content-between">
-                                btn trigger modal tambah barang masuk
-                                <button type="button" class="btn btn-primary my-2" data-toggle="modal"
-                                    data-target="#modalTambahBarang">
-                                    Tambah Barang
-                                </button>
-                                <a href="#0" class="btn btn-sm my-2 py-2 btn-info">
-                                    <i class="fas fa-download fa-sm text-white-50"></i> Unduh Excel
-                                </a>
-                            </div> -->
+                            <button class="btn btn-success" data-toggle="modal" data-target="#modalFilter"
+                                data-filter-type="tanggal">Hitung Total</button>
+                            <div class="totalPenjualanSesuaiTanggal my-2 text-dark" id="totalPenjualanSesuaiTanggal">
+                                <h4>Total penjualan pada tanggal <span id="tanggalTerpilih"></span>:</h4>
+                                <h2 class="text-success" id="totalPenjualanValue"></h2>
+                            </div>
                         </div>
 
                         <div class="card-body">
@@ -102,6 +104,28 @@ if ($_SESSION["is_login"] == false) {
                                 </table>
                             </div>
                         </div>
+
+                        <!-- Modal filter new -->
+                        <div class="modal fade" id="modalFilter">
+                            <div class="modal-dialog">
+                                <div class="modal-content text-dark">
+                                    <div class="modal-header">
+                                        <h4 class="modal-title">Filter</h4>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <form id="formFilterTanggal" method="POST">
+                                        <div class="modal-body" id="modalContent">
+                                            <!-- masukkan konten sesuai type-nya -->
+                                        </div>
+                                    </form>
+                                </div>
+                                <!-- /.modal-content -->
+                            </div>
+                            <!-- /.modal-dialog -->
+                        </div>
+                        <!-- Modal filter End -->
 
                         <!-- Modal edit barang keluar start -->
                         <div class="modal fade" id="modalEditBarangKeluar">
@@ -239,14 +263,97 @@ if ($_SESSION["is_login"] == false) {
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
 
-    <!-- Page level custom scripts -->
-    <!-- <script src="../js/demo/datatables-demo.js"></script> -->
-
     <script>
-        $(document).ready(function () {
-            var table = $('#tableBarangKeluar').DataTable({
-                "ajax": "../service/ajax/ajax-barang-keluar.php",
-                "columns": [{
+        // Mengubah konten modal sesuai filter yang diklik
+        document.querySelectorAll('[data-toggle="modal"]').forEach(filterIcon => {
+            filterIcon.addEventListener('click', function () {
+                const filterType = this.getAttribute('data-filter-type');
+                const modalContent = document.getElementById('modalContent');
+
+                if (filterType === 'tanggal') {
+                    modalContent.innerHTML = `
+                <div id="modalFilterTanggal" class="filter-tanggal">
+                    <div class="containerFilterTanggalLabel row">
+                        <label class="col" for="tanggalFilter">Tanggal :</label>
+                    </div>
+                    <div class="containerFilterTanggalInput row">
+                        <input class="col form-control" type="date" name="tanggalFilter" id="tanggalFilter">
+                    </div>
+                </div>
+                <div class="modal-footer justify-content-between">
+                        <button type="button" class="btn btn-success"
+                            onclick="applyFilter('tanggal')" name="terapkanFilter"
+                            id="terapkanFilter">Terapkan</button>
+                </div>
+                `;
+                }
+            });
+        });
+
+        function applyFilter(type) {
+            // Pastikan filter jenis tanggal yang diklik
+            if (type == 'tanggal') {
+                // Ambil nilai dari input tanggalFrom dan tanggalTo
+                const tanggalFilter = $('#tanggalFilter').val();
+
+                if (tanggalFilter) {
+                    tampilkanDataSesuaiFilter("tanggal", tanggalFilter);
+                } else {
+                    alert("Tidak ada filter tanggal yang dipilih pada modal");
+                }
+                $('#modalFilter').modal('hide');
+            } else {
+                alert('Tidak ada data yang sesuai filter');
+            }
+        }
+
+        tampilkanDataSesuaiFilter();
+        var table;
+
+        function tampilkanDataSesuaiFilter(filterName, value1, value2, value3, value4) {
+            let url = "";
+
+            if (filterName == "tanggal") {
+                url = "../service/ajax/ajax-barang-keluar.php?tanggalFilter=" + encodeURIComponent(value1);
+            } else {
+                url = "../service/ajax/ajax-barang-keluar.php";
+            }
+
+            // Hapus dan inisialisasi ulang DataTables
+            if (table) {
+                table.destroy();
+            }
+
+            table = $('#tableBarangKeluar').DataTable({
+                destroy: true,
+                ajax: {
+                    url: url,
+                    dataSrc: function (response) {
+                        // Format tanggal ke format "29 November 2024"
+                        const tanggalFormatted = new Date(value1).toLocaleDateString('id-ID', {
+                            weekday: 'long', // Menampilkan hari
+                            day: 'numeric',
+                            month: 'long',
+                            year: 'numeric'
+                        });
+
+                        // Ambil `total_harga` dari respons JSON
+                        if (response.total_harga !== undefined) {
+                            $('#totalPenjualanSesuaiTanggal').html(`
+                        <h4>Total penjualan pada : ${tanggalFormatted}</h4>
+                        <h2 class="text-success">Rp. ${response.total_harga.toLocaleString('id-ID')}</h2>
+                    `).css('display', 'block');
+                        } else {
+                            $('#totalPenjualanSesuaiTanggal').html(`
+                                <h4>Total penjualan pada : ...</h4>
+                                <h2 class="text-danger">Rp. 0</h2>
+                            `).css('display', 'block');
+                        }
+
+                        return response.data;
+                    }
+                },
+                columns: [{
                     "data": "no"
                 },
                 {
@@ -276,25 +383,12 @@ if ($_SESSION["is_login"] == false) {
                     "searchable": true
                 }
                 ],
+                pageLength: 100, // Menampilkan 100 data per halaman
                 "responsive": true
             });
+        }
 
-            // Tambah Barang
-            // $('#tambahkanBarang').click(function () {
-            //     var data = $('#formTambahBarang').serialize();
-            //     $.ajax({
-            //         url: '../service/ajax/ajax-barang-masuk.php',
-            //         type: 'POST',
-            //         data: data,
-            //         success: function (response) {
-            //             $('#modalTambahBarang').modal('hide');
-            //             table.ajax.reload();
-            //             $('#formTambahBarang')[0].reset();
-            //             alert(response);
-            //         }
-            //     });
-            // });
-
+        $(document).ready(function () {
             // Menampilkan modal Edit barang masuk
             $('#tableBarangKeluar').on('click', '.edit', function () {
                 let barang_keluar_id = $(this).data('barang_keluar_id');
@@ -353,7 +447,6 @@ if ($_SESSION["is_login"] == false) {
                 }
             });
         });
-
     </script>
 
 </body>
