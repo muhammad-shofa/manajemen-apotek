@@ -351,7 +351,8 @@ if ($_SESSION["is_login"] == false) {
                     "searchable": true
                 }
                 ],
-                "responsive": true
+                "responsive": true,
+                paging: false
             });
 
             // Tambah Barang

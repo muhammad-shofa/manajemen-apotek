@@ -384,7 +384,8 @@ if ($_SESSION["is_login"] == false) {
                 }
                 ],
                 pageLength: 100, // Menampilkan 100 data per halaman
-                "responsive": true
+                "responsive": true,
+                paging: false
             });
         }
 
