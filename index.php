@@ -69,7 +69,7 @@ if (isset($_POST["masuk"])) {
                                 <div class="p-5 my-5">
                                     <div class="text-center">
                                         <h1 class="h3 text-gray-900 mb-4">Selamat Datang di <b>Manajemen Apotek<br>
-                                                Senori Farma!</b>
+                                                Bangilan Farma!</b>
                                         </h1>
                                     </div>
                                     <form class="user" method="post" action="">

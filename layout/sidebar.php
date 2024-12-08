@@ -4,7 +4,7 @@
     <!-- Sidebar - Brand -->
     <a class="sidebar-brand d-flex align-items-center justify-content-center py-3" href="../index.php">
         <!-- <div class="sidebar-brand-icon py-3"> -->
-        <h6 class="mt-3"><b>Manajemen Apotek Senori Farma</b></h6>
+        <h6 class="mt-3"><b>Manajemen Apotek Bangilan Farma</b></h6>
         <!-- </div> -->
     </a>
 
