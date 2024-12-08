@@ -135,37 +135,7 @@ if ($_SESSION["is_login"] == false) {
                             <hr>
                             <div id="keranjangContainer" class="w-100 d-flex flex-column p-2">
                                 <!-- Produk dari daftar produk akan ditambahkan di sini -->
-                                <?php
-                                $result = $connected->query("SELECT b.nama, t.kuantitas, t.harga, t.total_harga FROM transaksi_kasir t JOIN barang b ON t.barang_id = b.barang_id WHERE t.status = 'O'");
-                                if ($result->num_rows > 0) {
-                                    while ($data = $result->fetch_assoc()) {
-                                        ?>
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            <h5 class="text-dark">
-                                                <?= $data['nama'] ?>
-                                            </h5>
-                                            <div class="d-flex align-items-center">
-                                                <button class=" btn btn-sm btn-outline-secondary me-2">
-                                                    <i class=" fas fa-minus"></i>
-                                                </button>
-                                                <input type="number" style="max-width: 80px;"
-                                                    class="jumlahKeluar form-control mx-2" value="<?= $data['kuantitas'] ?>"
-                                                    min="1">
-                                                <button class="btn btn-sm btn-outline-secondary ms-2">
-                                                    <i class="fas fa-plus"></i>
-                                                </button>
-                                            </div>
-                                            <p class="harga" data-barang_id="<?= $data['barang_id'] ?>">
-                                                <?= $data['harga'] ?>
-                                            </p>
-                                            <!-- <p><= $data['harga'] ?></p> -->
-                                            <p class="totalHarga">Rp <?= $data['total_harga'] ?></p>
-                                            <button class="btn btn-sm btn-outline-danger ms-2">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </div>
-                                    <?php }
-                                } ?>
+
                             </div>
                             <!-- Total Harga Semua Barang -->
                             <div class="mt-3">
@@ -426,6 +396,20 @@ if ($_SESSION["is_login"] == false) {
                 });
             });
 
+            $('#btnSelesai').click(function () {
+                $.ajax({
+                    url: '../service/ajax/ajax-kasir-2.php?selesaikan-transaksi=1',
+                    type: 'POST',
+                    success: function (response) {
+                        loadKeranjang(); // Ini opsional, jika ingin menyegarkan keranjang
+                        loadTotalSemuaHargaKeranjang(); // Opsional, jika ingin memperbarui total harga
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('Error:', error);
+                        alert('Gagal menyelesaikan transaksi.');
+                    }
+                });
+            })
 
         });
 

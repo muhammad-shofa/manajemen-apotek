@@ -110,7 +110,7 @@ if ($_SESSION["is_login"] == false) {
                             <div class="modal-dialog">
                                 <div class="modal-content text-dark">
                                     <div class="modal-header">
-                                        <h4 class="modal-title">Filter</h4>
+                                        <h4 class="modal-title">Hitung Total</h4>
                                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                             <span aria-hidden="true">&times;</span>
                                         </button>
@@ -218,26 +218,6 @@ if ($_SESSION["is_login"] == false) {
         <i class="fas fa-angle-up"></i>
     </a>
 
-    <!-- Logout Modal-->
-    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
-                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">×</span>
-                    </button>
-                </div>
-                <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
-                <div class="modal-footer">
-                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-                    <a class="btn btn-primary" href="login.html">Logout</a>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- Bootstrap core JavaScript-->
     <script src="../vendor/jquery/jquery.min.js"></script>
     <script src="../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
@@ -264,6 +244,9 @@ if ($_SESSION["is_login"] == false) {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
 
     <script>
+
+
+
         // Mengubah konten modal sesuai filter yang diklik
         document.querySelectorAll('[data-toggle="modal"]').forEach(filterIcon => {
             filterIcon.addEventListener('click', function () {
@@ -277,7 +260,7 @@ if ($_SESSION["is_login"] == false) {
                         <label class="col" for="tanggalFilter">Tanggal :</label>
                     </div>
                     <div class="containerFilterTanggalInput row">
-                        <input class="col form-control" type="date" name="tanggalFilter" id="tanggalFilter">
+                        <input class="col form-control" type="date" name="tanggalFilter" id="tanggalFilter" placeholder="dd/mm/yyyy">
                     </div>
                 </div>
                 <div class="modal-footer justify-content-between">
@@ -286,6 +269,15 @@ if ($_SESSION["is_login"] == false) {
                             id="terapkanFilter">Terapkan</button>
                 </div>
                 `;
+
+                    const inputTanggal = document.getElementById('tanggalFilter');
+                    inputTanggal.addEventListener('change', function () {
+                        const [year, month, day] = this.value.split('-');
+                        const formattedDate = `${day}/${month}/${year}`;
+                        this.value = ""; // Kosongkan nilai agar tidak menunjukkan format default
+                        this.type = "text"; // Ubah menjadi text untuk menampilkan format kustom
+                        this.value = formattedDate; // Tampilkan format dd/mm/yyyy
+                    });
                 }
             });
         });
@@ -293,8 +285,8 @@ if ($_SESSION["is_login"] == false) {
         function applyFilter(type) {
             // Pastikan filter jenis tanggal yang diklik
             if (type == 'tanggal') {
-                // Ambil nilai dari input tanggalFrom dan tanggalTo
-                const tanggalFilter = $('#tanggalFilter').val();
+                // Ambil nilai dari inputan tanggal
+                const tanggalFilter = $('#tanggalFilter').val(); // String, ex "dd/mm/yy = 29/12/2024"
 
                 if (tanggalFilter) {
                     tampilkanDataSesuaiFilter("tanggal", tanggalFilter);
@@ -390,6 +382,9 @@ if ($_SESSION["is_login"] == false) {
         }
 
         $(document).ready(function () {
+
+
+
             // Menampilkan modal Edit barang masuk
             $('#tableBarangKeluar').on('click', '.edit', function () {
                 let barang_keluar_id = $(this).data('barang_keluar_id');

@@ -161,6 +161,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             break;
 
+        // Case untuk menyelesaikan transaksi dan memindahkan barang ke barang_keluar
+        // case 'selesaikan_transaksi':
+        //     // Ambil data barang dengan status 'O' (Open) dari transaksi_kasir
+        //     $result = $connected->query("SELECT t.barang_id, t.kuantitas, t.harga, t.total_harga, b.kategori FROM transaksi_kasir t JOIN barang b ON t.barang_id = b.barang_id WHERE t.status = 'O'");
+
+        //     if ($result->num_rows > 0) {
+        //         // Persiapkan query untuk memasukkan data ke dalam tabel barang_keluar
+        //         $insertQuery = "INSERT INTO barang_keluar (barang_id, kategori, jumlah_keluar, harga_satuan, total_harga, tanggal, keterangan) VALUES (?, ?, ?, ?, ?, NOW(), 'Penjualan')";
+        //         $stmt = $connected->prepare($insertQuery);
+
+        //         // Perulangan untuk setiap barang yang ditemukan
+        //         while ($data = $result->fetch_assoc()) {
+        //             $barang_id = $data['barang_id'];
+        //             $kategori = $data['kategori'];
+        //             $jumlah_keluar = $data['kuantitas'];
+        //             $harga = $data['harga'];
+        //             $total_harga = $data['total_harga'];
+
+        //             // Bind parameter untuk query insert
+        //             $stmt->bind_param('isiii', $barang_id, $kategori, $jumlah_keluar, $harga, $total_harga);
+        //             $stmt->execute(); // Jalankan query insert
+        //         }
+
+        //         $updateQuery = "UPDATE transaksi_kasir SET status = 'C' WHERE status = 'O'";
+        //         $connected->query($updateQuery);
+
+        //         // Kirimkan response sukses
+        //         echo json_encode(['success' => true, 'message' => 'Transaksi selesai']);
+        //     } else {
+        //         echo json_encode(['success' => false, 'message' => 'Tidak ada barang di keranjang']);
+        //     }
+        //     break;
+
+
         default:
             $response['message'] = 'Aksi tidak dikenali';
     }

@@ -30,10 +30,19 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
         echo json_encode($data);
     } else {
         if (isset($_GET['tanggalFilter'])) {
-            $tanggalFilter = $_GET['tanggalFilter'];
-            // echo $tanggalFilter;
+            $tanggalFilter = $_GET['tanggalFilter']; // String, ex "dd/mm/yy = 29/12/2024"
 
-            $result = $connected->query($select->selectTable($table_name = "barang_keluar", $fields = "bk.*, b.nama ", $condition = "bk JOIN barang b ON bk.barang_id = b.barang_id WHERE bk.tanggal_keluar = '$tanggalFilter'"));
+            // Format tanggal dari inputan agar sesuai dengan yang ada di dalam databse
+            // Konversi format tanggal dari dd/mm/yyyy menjadi yyyy-mm-dd
+            $dateObject = DateTime::createFromFormat('d/m/Y', $tanggalFilter);
+            if ($dateObject) {
+                $tanggalFormatted = $dateObject->format('Y-m-d'); // Format ke yyyy-mm-dd
+            } else {
+                die("Format tanggal tidak valid!"); // Handle jika format tanggal salah
+            }
+
+
+            $result = $connected->query($select->selectTable($table_name = "barang_keluar", $fields = "bk.*, b.nama ", $condition = "bk JOIN barang b ON bk.barang_id = b.barang_id WHERE bk.tanggal_keluar = '$tanggalFormatted'"));
 
             $data = [];
             $totalKeseluruhan = 0; // Variabel untuk menghitung total keseluruhan
